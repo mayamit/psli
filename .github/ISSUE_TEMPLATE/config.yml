@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Design & build brief
-    url: https://github.com/mayamit/Sable/blob/main/docs/Sable_Website_Design_Brief.md
+    url: https://github.com/mayamit/psli/blob/main/docs/Sable_Website_Design_Brief.md
     about: Read the full brief before opening or starting an issue.
   - name: CLAUDE.md (build rules)
-    url: https://github.com/mayamit/Sable/blob/main/CLAUDE.md
+    url: https://github.com/mayamit/psli/blob/main/CLAUDE.md
     about: Naming, positioning, tokens, routes, and guardrails Claude Code must follow.

@@ -1,6 +1,6 @@
-// Join the configured base path (`/Sable` on GitHub Pages) with an internal
+// Join the configured base path (`/psli` on GitHub Pages) with an internal
 // path so links + assets resolve correctly. Use for ALL internal hrefs/srcs.
-const base = import.meta.env.BASE_URL; // e.g. "/Sable/"
+const base = import.meta.env.BASE_URL; // e.g. "/psli/"
 
 export function href(path = '/'): string {
   const b = base.endsWith('/') ? base.slice(0, -1) : base;

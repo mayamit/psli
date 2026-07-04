@@ -36,11 +36,11 @@
 
 ## Key pages
 
-- Home: /Sable/
-- How it works: /Sable/how-it-works
-- Lenses: /Sable/lenses
-- Privacy & Trust: /Sable/privacy
-- Home Server: /Sable/home-server
-- Pricing: /Sable/pricing
-- Vision: /Sable/vision
-- Get early access: /Sable/waitlist
+- Home: /psli/
+- How it works: /psli/how-it-works
+- Lenses: /psli/lenses
+- Privacy & Trust: /psli/privacy
+- Home Server: /psli/home-server
+- Pricing: /psli/pricing
+- Vision: /psli/vision
+- Get early access: /psli/waitlist

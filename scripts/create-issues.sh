@@ -6,7 +6,7 @@
 #   3) Run:  bash scripts/create-issues.sh
 set -euo pipefail
 
-REPO="mayamit/Sable"
+REPO="mayamit/psli"
 
 # --- Labels -----------------------------------------------------------------
 echo "Creating labels in $REPO ..."

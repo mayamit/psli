@@ -4,12 +4,12 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-// GitHub Pages project site: served from https://mayamit.github.io/Sable/
+// GitHub Pages project site: served from https://mayamit.github.io/psli/
 // `base` keeps every internal link + asset path correct. When a custom domain
 // is added later, set `site` to it and change `base` to '/'.
 export default defineConfig({
   site: 'https://mayamit.github.io',
-  base: '/Sable',
+  base: '/psli',
   trailingSlash: 'ignore',
   integrations: [
     mdx(),

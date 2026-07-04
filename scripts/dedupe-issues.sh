@@ -3,7 +3,7 @@
 # Keeps the LOWEST-numbered issue for each unique title and deletes the rest.
 # Prereq: gh auth login.  Run:  bash scripts/dedupe-issues.sh
 set -euo pipefail
-REPO="mayamit/Sable"
+REPO="mayamit/psli"
 
 echo "Scanning open issues in $REPO ..."
 # number<TAB>title, sorted ascending by number; awk prints the DUPES (title already seen).
