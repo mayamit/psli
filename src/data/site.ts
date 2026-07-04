@@ -1,11 +1,14 @@
 // Site-wide copy + structure. Never hard-code these in components.
 
 export const site = {
-  name: 'Sable',
-  legalName: 'Sable, by PSL',
+  // Working name: "Personal Semantic Layer (PSL/i)". Short form "PSL/i" for
+  // the logo, titles, and repeat mentions; full name on first/prominent use.
+  name: 'PSL/i',
+  fullName: 'Personal Semantic Layer (PSL/i)',
+  legalName: 'Personal Semantic Layer (PSL/i), by PSL',
   tagline: 'An AI that actually knows you.',
   description:
-    'Sable is an AI that actually knows you — it resolves what your life and work mean once, holds it privately, and reuses it across your apps. A packaged product, not a chatbot.',
+    'Personal Semantic Layer (PSL/i) is an AI that actually knows you — it resolves what your life and work mean once, holds it privately, and reuses it across your apps. A packaged product, not a chatbot.',
   trustTagline: 'Your data. Your context. Your decisions.',
 };
 

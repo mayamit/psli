@@ -1,13 +1,15 @@
-# CLAUDE.md — Sable marketing site
+# CLAUDE.md — Personal Semantic Layer (PSL/i) marketing site
 
-You are building the **Sable** marketing website. Read this file every session. Full detail: `Sable_Website_Design_Brief.md`.
+You are building the **Personal Semantic Layer (PSL/i)** marketing website. Read this file every session. Full detail: `Sable_Website_Design_Brief.md`.
+
+> **Naming update (2026‑07‑04):** the product working name is now **Personal Semantic Layer (PSL/i)** (short form **PSL/i**), replacing the former name *Sable*. Older parts of the brief may still say “Sable” — treat those as “PSL/i”.
 
 ## Brand & naming (strict)
-- Product = **Sable**. Company/brand = **PSL**. Footer/legal: “**Sable, by PSL**”.
-- “personal semantic layer” is a **descriptor** for How‑it‑works / Vision only. **Never** in the hero.
-- Never open with architecture words (semantic layer, ontology, deterministic, infrastructure).
+- Product = **Personal Semantic Layer (PSL/i)**. Company/brand = **PSL**. Footer/legal: “**Personal Semantic Layer (PSL/i), by PSL**”.
+- Use the **full name on the first/prominent mention** of a page, then the short form **PSL/i** for the logo and repeat mentions.
+- The **hero stays outcome‑led** — keep the headline “An AI that actually knows you.” Introduce the name in the eyebrow, not the headline. Don’t turn the headline into an architecture phrase.
 
-## What Sable is (one line)
+## What PSL/i is (one line)
 An AI that actually knows you — it resolves what your life and work mean once, holds it privately, and reuses it across your apps. Navigator (proposes, acts only after you approve) · Foundation (private store of resolved meaning, with provenance + audit) · two V1 lenses (Communications, Reasoning) · $100/mo · Cloud + Home‑Server tiers · trust by design.
 
 ## Positioning rules

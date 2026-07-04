@@ -1,10 +1,10 @@
 // Copy for the Privacy & Trust page (brief §7, the differentiator page).
 
 export const canSee = {
-  headline: 'What Sable can — and can’t — see.',
-  subhead: 'No surprises. Sable only ever works with what you explicitly connect.',
+  headline: 'What PSL/i can — and can’t — see.',
+  subhead: 'No surprises. PSL/i only ever works with what you explicitly connect.',
   can: {
-    title: 'What Sable can see',
+    title: 'What PSL/i can see',
     items: [
       'The apps you explicitly connect — and only those',
       'The meaning it resolves from them (people, commitments, money, documents)',
@@ -12,7 +12,7 @@ export const canSee = {
     ],
   },
   cannot: {
-    title: 'What Sable can’t do',
+    title: 'What PSL/i can’t do',
     items: [
       'Reach into anything you haven’t connected',
       'Send, change, or delete anything without your approval',
@@ -22,7 +22,7 @@ export const canSee = {
 };
 
 export const foundation = {
-  headline: 'See everything Sable knows about you.',
+  headline: 'See everything PSL/i knows about you.',
   subhead:
     'Your Foundation is inspectable, down to the source. Every fact can be traced, edited, or deleted — by you, at any time.',
   facts: [

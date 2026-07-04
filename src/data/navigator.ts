@@ -3,9 +3,9 @@
 
 export const navigatorApproval = {
   title: 'Review & approve',
-  subhead: '3 things Sable prepared for you. Nothing is sent or changed until you approve.',
+  subhead: '3 things PSL/i prepared for you. Nothing is sent or changed until you approve.',
   auto: 'Routine updates — filing, labels, contact details — were applied automatically. Only outbound actions and anything unusual stop here.',
-  footer: 'You are always the last step. Sable proposes; you decide.',
+  footer: 'You are always the last step. PSL/i proposes; you decide.',
   // The first item is shown expanded with a preview + actions.
   items: [
     {
