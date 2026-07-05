@@ -6,9 +6,11 @@
 
 - **Navigator** takes intent in plain language, proposes actions, and acts only after you approve (human-gated writes).
 - **Foundation** is your private, per-user store of resolved meaning — people, commitments, money, documents — with a source trace and audit on every fact.
-- **Lenses** are focused surfaces over your Foundation. Two ship at launch:
+- **Lenses** are focused surfaces over your Foundation. Four ship at launch:
   - **Communications** — triage plus drafts written in your voice, grounded in what PSL/i already knows.
   - **Reasoning** — answers questions over your own life and context (not the open internet), with source traces.
+  - **Document** — resolves contracts, statements, receipts and files into commitments and payments.
+  - **Photo & media** — recall by date, place, object and scene, including text inside images. No faces or video in V1 (opt-in fast-follow).
 
 ## Pricing and tiers
 

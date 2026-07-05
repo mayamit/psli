@@ -58,9 +58,9 @@ export const howItWorks = {
 };
 
 export const lenses = {
-  headline: 'Two lenses at launch. Both know your whole life.',
+  headline: 'Four lenses at launch. One shared foundation.',
   subhead:
-    'Lenses are focused surfaces over your Foundation. More are coming — these two ship first.',
+    'Lenses are focused surfaces over your Foundation. Four ship at launch — more are coming.',
   items: [
     {
       name: 'Communications',
@@ -76,6 +76,20 @@ export const lenses = {
       body: 'A generalist that reasons over your actual context — not the open internet. Ask about your commitments, money, and people, and get answers with source traces.',
       example: '“What do I owe Jane, and when is it due?”',
     },
+    {
+      name: 'Document',
+      accent: 'amber',
+      tagline: 'Files that become facts.',
+      body: 'Contracts, statements, receipts and files — Document turns them into commitments and payments, not just PDFs in a folder.',
+      example: '“When does my lease renew, and what’s the notice period?”',
+    },
+    {
+      name: 'Photo & media',
+      accent: 'teal',
+      tagline: 'Find anything you’ve seen.',
+      body: 'Recall your photos by date, place, object and scene — even the text inside them. (Faces and video arrive after V1.)',
+      example: '“Find the receipt photo from the Tokyo trip.”',
+    },
   ],
   cta: { label: 'Explore the lenses', href: '/lenses' },
 };
@@ -84,7 +98,7 @@ export const worksOverApps = {
   headline: 'Works over the apps you already use.',
   subhead:
     'PSL/i connects to your existing tools and leaves them as the system of record. Nothing gets migrated. Nothing gets locked in.',
-  connectors: ['Email', 'Calendar', 'Contacts', 'Messaging', 'Documents', 'Notes'],
+  connectors: ['Email', 'Calendar', 'Contacts', 'Messaging', 'Documents', 'Photos'],
 };
 
 export const trust = {
@@ -155,7 +169,7 @@ export const pricing = {
   price: '$100',
   cadence: '/month',
   includes: [
-    'Both V1 lenses — Communications & Reasoning',
+    'All four V1 lenses — Communications, Reasoning, Document & Photo',
     'Navigator with human-gated actions',
     'Your private Foundation with full audit',
     'Cloud or Home Server — your choice',

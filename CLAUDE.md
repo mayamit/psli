@@ -10,14 +10,16 @@ You are building the **Personal Semantic Layer (PSL/i)** marketing website. Read
 - The **hero stays outcome‑led** — keep the headline “An AI that actually knows you.” Introduce the name in the eyebrow, not the headline. Don’t turn the headline into an architecture phrase.
 
 ## What PSL/i is (one line)
-An AI that actually knows you — it resolves what your life and work mean once, holds it privately, and reuses it across your apps. Navigator (proposes, acts only after you approve) · Foundation (private store of resolved meaning, with provenance + audit) · two V1 lenses (Communications, Reasoning) · $100/mo · Cloud + Home‑Server tiers · trust by design.
+An AI that actually knows you — it resolves what your life and work mean once, holds it privately, and reuses it across your apps. Navigator (proposes, acts only after you approve) · Foundation (private store of resolved meaning, with provenance + audit) · four V1 lenses (Communications, Reasoning, Document, Photo/media) · $100/mo · Cloud + Home‑Server tiers · trust by design.
+
+> **Scope update (2026‑07‑05):** V1 launches with **four lenses**, not two — Communications, Reasoning, **Document** (files/contracts/receipts → commitments & payments), and **Photo/media** (recall by date/place/object + text‑in‑image; **no faces or video in V1**). Source: `docs/research/15_Change_Summary_v1_to_v2.pdf` (“2 lenses → 4 lenses”), corroborated by the Product Roadmap deck and V1 Feature Board. Older docs/brief may still say “two lenses.”
 
 ## Positioning rules
 - Lead with the **outcome**, then show the surface, then explain the idea.
 - “A packaged product, **not a chatbot**.”
 - Sell **memory + trust together**.
 - Concrete examples: “What do I owe Jane?”, “Prepare renewal summary”, “Show me at‑risk commitments”.
-- ⚠ The `UI_Work_Surface` mockup is the **V3 vision** — use it only on the **Vision** page / as aspirational hero accent. Never present it as the V1 product. V1 = two lenses over existing apps.
+- ⚠ The `UI_Work_Surface` mockup is the **V3 vision** — use it only on the **Vision** page / as aspirational hero accent. Never present it as the V1 product. V1 = four lenses over existing apps.
 - No SOC 2 / HIPAA / compliance badges until real. Legal pages need counsel.
 
 ## Approved copy (reuse, swap in *Sable*)
