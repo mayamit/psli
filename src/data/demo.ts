@@ -357,3 +357,331 @@ export const cta = {
   buttonLabel: "Request early access",
   href: "/waitlist",
 };
+
+// ============================================================================
+// PSL/i — DEMO EXPANSION BLOCK  (additive — paste at the END of src/data/demo.ts)
+// ----------------------------------------------------------------------------
+// Zero-collision: this only ADDS new exports; it does not redeclare anything
+// already in demo.ts. To use the richer set, point components at the merged
+// `all*` arrays exported at the bottom (or spread the *Extra arrays into your
+// originals). Keeps today = "Thursday, July 16".
+//
+// Adds: more volume · work+life cross-domain · narrative spine · cross-connections
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// PEOPLE (extra) — widen the world to ~16 resolved relationships
+// ---------------------------------------------------------------------------
+export const peopleExtra: Person[] = [
+  { id: "alex",    name: "Alex Reyes",     role: "Ops Lead, Fresno Depot (Cascade)", relationship: "Prospect (rollout)",   accent: "green",  initials: "AR" },
+  { id: "dana",    name: "Dana Whitfield", role: "Growth Advisor",                   relationship: "Intro from Glenn",     accent: "violet", initials: "DW" },
+  { id: "wei",     name: "Wei Tan",        role: "Fractional CFO, Northwind",        relationship: "Finance",              accent: "blue",   initials: "WT" },
+  { id: "sofia",   name: "Sofia Renn",     role: "Senior Engineer (candidate)",      relationship: "Hiring — final round", accent: "teal",   initials: "SR" },
+  { id: "deepa",   name: "Deepa Rao",      role: "Ops Director, Harbor Logistics",   relationship: "Customer (Harbor)",    accent: "green",  initials: "DR" },
+  { id: "nina",    name: "Nina Alvarez",   role: "—",                                relationship: "Close friend",         accent: "rose",   initials: "NA" },
+  { id: "gusto",   name: "Gusto Payroll",  role: "Automated",                        relationship: "Vendor (payroll)",     accent: "amber",  initials: "GP" },
+  { id: "airline", name: "Horizon Air",    role: "Automated",                        relationship: "Travel",               accent: "blue",   initials: "HA" },
+];
+
+// ---------------------------------------------------------------------------
+// EMAILS (extra) — e13..e26 — the sources for everything below
+// ---------------------------------------------------------------------------
+export const emailsExtra: Email[] = [
+  { id: "e13", from: "jane", subject: "West Region load test — heads up on infra", date: "Tue",
+    snippet: "Ran the 4-depot load test on staging. Spun up extra EC2 — will bump the AWS bill this month.",
+    body: "Maya — I ran the full West Region load test on staging (simulated all 4 depots). Had to spin up a lot of extra EC2 + data transfer for a few days, so expect the AWS bill to jump this month. Good news: it held up clean at 4x load. — J" },
+  { id: "e14", from: "tomás", subject: "Re: West Region rollout — timing", date: "Wed",
+    snippet: "Between us — leadership asked us to also price a competing tool. Nothing decided, but move quick.",
+    body: "Maya, one thing between us: leadership asked procurement to also get a quote from a competing tool before final sign-off. I'm still fully behind you, but the faster we can close the MSA and show the security posture, the better. Let's not let this drift. — Tomás" },
+  { id: "e15", from: "alex", subject: "Intro from Priya? — Fresno rollout", date: "Wed",
+    snippet: "Priya said you'd connect us. I run ops at the Fresno depot — keen to scope go-live.",
+    body: "Hi Maya — Priya mentioned you'd introduce us. I run operations at the Fresno depot and I'm the one who'll own the PSL rollout on our side. Would love 30 minutes to scope timing and what we need from our team. — Alex" },
+  { id: "e16", from: "wei", subject: "Payroll runs tomorrow + burn note", date: "Wed",
+    snippet: "Payroll ($82,400) runs Fri — please approve today. Also, June burn was $210k; runway ~14 mo.",
+    body: "Maya — two things. (1) Payroll of $82,400 runs Friday; needs your approval by end of today. (2) June burn came in at $210k — runway ~14 months at current spend. The revised model for Glenn should reflect the West Region revenue, which improves this materially. — Wei" },
+  { id: "e17", from: "sofia", subject: "Following up — Northwind offer", date: "Tue",
+    snippet: "Really enjoyed final round. I have another offer with a Friday deadline — hoping to hear from you.",
+    body: "Hi Maya — thank you again for the final round, I'm excited about Northwind. I want to be transparent: I have a competing offer with a decision deadline this Friday. You're my first choice — is there any way to know where things stand by then? — Sofia" },
+  { id: "e18", from: "deepa", subject: "Harbor — small bug + expansion interest", date: "Mon",
+    snippet: "Minor export bug our team hit. Also: we're opening 2 depots in Q4 and may want to expand seats.",
+    body: "Hi Maya — two things from the Harbor side. First, a couple of our users hit a bug exporting the weekly manifest (screenshot attached). Second, and more fun: we're opening two new depots in Q4 and would likely want to add seats. Can we set time next week? — Deepa" },
+  { id: "e19", from: "nina", subject: "Can't wait for Saturday!! 💍", date: "Mon",
+    snippet: "You're still coming right? Rehearsal dinner Fri 8pm, wedding Sat 4pm. Did you RSVP the +1?",
+    body: "Maya!! Getting so close. You're still on for the weekend right? Rehearsal dinner Friday 8pm, wedding Saturday 4pm. I don't think the site got your +1 RSVP — can you confirm? Love you, can't wait. — Nina" },
+  { id: "e20", from: "airline", subject: "Your trip Friday — HZ 488 SFO→AUS", date: "Tue",
+    snippet: "Departs Fri 6:10 PM. Check-in opens 24h before. Fare rules: change fee applies.",
+    body: "Reminder: Horizon Air HZ 488, San Francisco (SFO) → Austin (AUS), departs Friday 6:10 PM, arrives 11:52 PM. Online check-in opens 24 hours before departure. This fare permits changes with a fee." },
+  { id: "e21", from: "glenn", subject: "Thursday call — 2pm?", date: "Wed",
+    snippet: "Does 2pm Thursday work to pre-align before I brief the partners? Should take 30 min.",
+    body: "Maya — does 2pm Thursday work for our pre-align call? I want to walk in Monday already knowing the story. 30 minutes should do it. — Glenn" },
+  { id: "e22", from: "david", subject: "Re: Cascade MSA — one more note", date: "Wed",
+    snippet: "If you can decide the liability cap today, I can return the redline tonight and we stay on track.",
+    body: "Maya — just flagging: the liability cap is the only real blocker now. If you can give me a yes/no on meeting them at 9 months (a middle path) today, I can turn the redline tonight and we keep the timeline. — David" },
+  { id: "e23", from: "renu", subject: "Re: Invoice #2214 — friendly nudge", date: "Wed",
+    snippet: "No pressure at all — just confirming you got Invoice #2214 ($4,200). Due the 21st.",
+    body: "Hi Maya — just making sure Invoice #2214 ($4,200) landed okay. Due the 21st, no pressure. Thanks again! — Renu" },
+  { id: "e24", from: "dana", subject: "Glenn connected us — early GTM", date: "Tue",
+    snippet: "Glenn suggested we talk. I've helped two Meridian companies with early GTM. Free next week?",
+    body: "Hi Maya — Glenn suggested we connect. I've worked with two Meridian portfolio companies on early go-to-market and would be happy to compare notes. Are you free for a call next week? — Dana" },
+  { id: "e25", from: "priya", subject: "Cascade — I can lead the onboarding", date: "Wed",
+    snippet: "Happy to own the Cascade technical onboarding once you intro me to Alex. Just say go.",
+    body: "Maya — I can fully own the Cascade technical onboarding across the 4 depots once you connect me with Alex at Fresno. Just need the intro and I'll run it. — Priya" },
+  { id: "e26", from: "deepa", subject: "Re: Harbor — reference call?", date: "Thu (last week)",
+    snippet: "Happy to be a reference for you with other logistics prospects whenever useful.",
+    body: "Also — happy to act as a reference for you with other logistics customers. We've had a great experience. Just send them my way. — Deepa" },
+];
+
+// ---------------------------------------------------------------------------
+// COMMITMENTS (extra) — c7..c12
+// ---------------------------------------------------------------------------
+export const commitmentsExtra: Commitment[] = [
+  { id: "c7",  text: "Approve Friday payroll ($82,400) for Wei",                 due: "Thu Jul 16", status: "at-risk",  personId: "wei",   sourceEmailId: "e16" },
+  { id: "c8",  text: "Give Sofia a decision on her offer (competing Fri deadline)", due: "Fri Jul 17", status: "at-risk",  personId: "sofia", sourceEmailId: "e17" },
+  { id: "c9",  text: "Decide the MSA liability cap (David's only blocker)",       due: "Thu Jul 16", status: "overdue", personId: "david", sourceEmailId: "e22" },
+  { id: "c10", text: "Confirm wedding attendance + RSVP the +1 for Nina",         due: "Fri Jul 17", status: "on-track", personId: "nina",  sourceEmailId: "e19" },
+  { id: "c11", text: "Reply to Alex (Fresno) to scope the rollout call",          due: "Fri Jul 17", status: "on-track", personId: "alex",  sourceEmailId: "e15" },
+  { id: "c12", text: "Set time with Deepa re: Harbor bug + Q4 expansion",         due: "Mon Jul 20", status: "on-track", personId: "deepa", sourceEmailId: "e18" },
+];
+
+// ---------------------------------------------------------------------------
+// MONEY (extra) — m5..m10
+// ---------------------------------------------------------------------------
+export const moneyExtra: MoneyItem[] = [
+  { id: "m5",  label: "Payroll — Gusto run (needs approval)",     amount: "$82,400", direction: "owe",         due: "Fri Jul 17", personId: "gusto", sourceEmailId: "e16", note: "Approve by today or it misses the cycle" },
+  { id: "m6",  label: "Wei Tan — fractional CFO (July)",          amount: "$6,500",  direction: "owe",         due: "Jul 25",     personId: "wei",   sourceEmailId: "e16" },
+  { id: "m7",  label: "Stripe payout — customer invoices",        amount: "$41,300", direction: "incoming",    due: "Jul 18",     personId: "deepa", sourceEmailId: "e18" },
+  { id: "m8",  label: "Harbor Logistics — Q4 seat expansion",     amount: "~$28,000",direction: "incoming",    due: "Q4",         personId: "deepa", sourceEmailId: "e18", note: "Upside — 2 new depots" },
+  { id: "m9",  label: "Horizon Air — wedding trip (booked)",      amount: "$612",    direction: "spend-alert", personId: "airline", sourceEmailId: "e20", note: "Non-refundable; changeable with fee" },
+  { id: "m10", label: "AWS spike — traced to West Region load test", amount: "+$5,210", direction: "spend-alert", personId: "aws", sourceEmailId: "e13", note: "Not a leak — it's the 4-depot load test" },
+];
+
+// ---------------------------------------------------------------------------
+// DOCUMENTS (extra) — d4..d7
+// ---------------------------------------------------------------------------
+export const documentsExtra: Doc[] = [
+  { id: "d4", title: "SOC 2 Type II report (2026)",       kind: "Security",  resolvedInto: "Pre-fills 80% of Cascade questionnaire", personId: "tomás", sourceEmailId: "e10" },
+  { id: "d5", title: "West Region pricing model (v3)",     kind: "Spreadsheet", resolvedInto: "Feeds Glenn's revised model + runway",  personId: "wei",   sourceEmailId: "e16" },
+  { id: "d6", title: "Sofia Renn — offer letter (draft)",  kind: "Offer",     resolvedInto: "Commitment c8 (decide by Fri)",          personId: "sofia", sourceEmailId: "e17" },
+  { id: "d7", title: "Cascade security questionnaire",     kind: "Form",      resolvedInto: "Blocks countersignature (c4)",           personId: "tomás", sourceEmailId: "e10" },
+];
+
+// ---------------------------------------------------------------------------
+// LIFE ITEMS — the cross-domain (non-work) threads. New optional collection.
+// ---------------------------------------------------------------------------
+export type LifeItem = {
+  id: string;
+  label: string;
+  when: string;
+  kind: "travel" | "event" | "personal" | "reminder";
+  personId?: string;
+  sourceEmailId?: string;
+  note?: string;
+};
+
+export const lifeItems: LifeItem[] = [
+  { id: "L1", label: "Flight to Austin — Nina's wedding", when: "Fri Jul 17, 6:10 PM", kind: "travel", personId: "airline", sourceEmailId: "e20", note: "Collides with the Glenn deadline day" },
+  { id: "L2", label: "Rehearsal dinner",                  when: "Fri Jul 17, 8:00 PM", kind: "event",  personId: "nina",    sourceEmailId: "e19" },
+  { id: "L3", label: "Nina's wedding",                    when: "Sat Jul 18, 4:00 PM", kind: "event",  personId: "nina",    sourceEmailId: "e19" },
+  { id: "L4", label: "RSVP the +1 (Nina asked twice)",    when: "by Fri Jul 17",       kind: "reminder", personId: "nina",  sourceEmailId: "e19" },
+];
+
+// ---------------------------------------------------------------------------
+// CONNECTIONS — the cross-links that make PSL/i feel like it *understands*.
+// Each edge references ids from any collection and states the insight + payoff.
+// This is the "how did it know that" material — surface these as callouts.
+// ---------------------------------------------------------------------------
+export type Connection = {
+  id: string;
+  kind: "dependency" | "same-entity" | "reframe" | "conflict" | "leverage";
+  nodes: string[];      // ids across emails/commitments/money/docs/life
+  insight: string;      // one-line "PSL/i noticed…"
+  payoff: string;       // why it matters to Maya
+};
+
+export const connections: Connection[] = [
+  { id: "x1", kind: "dependency", nodes: ["c9", "d5", "c1", "e21"],
+    insight: "The MSA liability-cap decision is blocking the West Region numbers, which block Glenn's model — which he briefs to partners Monday.",
+    payoff: "One yes/no today unblocks the whole chain into Monday's partner meeting." },
+  { id: "x2", kind: "reframe", nodes: ["m10", "e13", "e6"],
+    insight: "Your AWS bill jumped 38% — but it traces to Jane's 4-depot West Region load test, not a leak.",
+    payoff: "It's a positive signal: infra held at 4x load. Nothing to fix." },
+  { id: "x3", kind: "same-entity", nodes: ["c3", "e4", "e15", "e25"],
+    insight: "The 'Fresno depot ops lead' you owe Priya an intro to is Alex Reyes — who's already emailing you, and Priya's ready to run it.",
+    payoff: "One intro clears an overdue commitment and starts the rollout." },
+  { id: "x4", kind: "conflict", nodes: ["c1", "e21", "L1", "L2"],
+    insight: "Glenn wants a Thursday 2pm call and the model Friday — but you fly out Friday 6:10pm for Nina's rehearsal dinner.",
+    payoff: "PSL/i protects the personal plan: finish the model Thu night, keep Fri clear." },
+  { id: "x5", kind: "leverage", nodes: ["c4", "d4", "d7"],
+    insight: "Cascade's security questionnaire can be ~80% pre-filled from your existing SOC 2 report.",
+    payoff: "Turns a day of work into a review — and unblocks the countersignature." },
+  { id: "x6", kind: "leverage", nodes: ["e14", "c9", "c4", "e26"],
+    insight: "Cascade is quietly pricing a competitor — but Deepa (Harbor) offered to be a reference.",
+    payoff: "Speed on the MSA + a warm reference is how you close before the competitor lands." },
+  { id: "x7", kind: "reframe", nodes: ["m5", "m7", "c7"],
+    insight: "Payroll ($82,400) runs Friday, but a Stripe payout of $41,300 lands Thursday.",
+    payoff: "Cash timing is fine — approve payroll with confidence." },
+];
+
+// ---------------------------------------------------------------------------
+// STORYLINE — the narrative spine PSL/i can articulate on demand.
+// ---------------------------------------------------------------------------
+export const storyline = {
+  title: "The Monday crunch",
+  oneLine: "Everything this week bends toward Glenn's Monday partner meeting — and one decision today unlocks it.",
+  criticalPath: ["c9", "d5", "c1", "e21"], // MSA cap → model → Glenn → partners
+  theTension:
+    "It's Thursday. Glenn briefs his partners Monday morning off your revised model. The model needs the West Region numbers, which are stuck behind the MSA liability-cap decision David needs today. Cascade is quietly pricing a competitor, and you fly out Friday evening for your best friend's wedding. The week looks chaotic — but it's really one chain.",
+  theResolution:
+    "Say yes to the 9-month cap (David returns the redline tonight), send Wei the go-ahead so the model reflects West Region revenue, pre-fill the security questionnaire from SOC 2, intro Priya to Alex, and you walk onto that flight Friday with the partner meeting already won.",
+};
+
+// ---------------------------------------------------------------------------
+// SCENE 2 (extra) — more Navigator intents so free-typing rarely misses.
+// Merge these into scene2.responses (spread) and add to suggestedPrompts.
+// ---------------------------------------------------------------------------
+export const scene2ExtraPrompts = [
+  "Say yes to the 9-month liability cap and tell David",
+  "Pre-fill the Cascade security questionnaire from our SOC 2",
+  "Approve Friday payroll",
+  "Intro Priya to Alex at the Fresno depot",
+  "Tell Sofia she's got the offer",
+];
+
+export const scene2ExtraResponses = {
+  "msa-cap": {
+    matches: ["liability", "cap", "9-month", "9 month", "msa", "david", "yes to"],
+    intent: "Say yes to the 9-month liability cap and tell David",
+    proposals: [
+      { type: "email", title: "Proposed reply to David Stern", to: "David Stern",
+        subject: "Re: Cascade MSA — one more note",
+        draft: "David — yes, let's meet them at a 9-month liability cap. Hold firm on US-only data (no EU SCCs). If you can return the redline tonight we stay on track for Monday. Thanks for pushing. — Maya",
+        sourceEmailId: "e22" },
+      { type: "reminder", title: "Proposed status update", detail: "Tell Wei the West Region terms are settled so the model can finalize", when: "Today · after David confirms", linkedCommitmentId: "c1" },
+    ],
+    onApprove: { confirmation: "Reply sent to David · Wei looped in", audit: "Navigator · 2 actions · approved by Maya · unblocks critical path x1" },
+    onDecline: { confirmation: "Nothing sent. Draft saved." },
+  },
+  "questionnaire": {
+    matches: ["questionnaire", "security", "soc 2", "soc2", "pre-fill", "prefill"],
+    intent: "Pre-fill the Cascade security questionnaire from our SOC 2",
+    proposals: [
+      { type: "document", title: "Proposed: draft questionnaire from SOC 2", detail: "42 of 53 answers pre-filled from SOC 2 Type II report", sourceEmailId: "e10", highGate: false },
+      { type: "reminder", title: "Proposed task", detail: "Review 11 remaining answers, then send to Tomás", when: "Today", linkedCommitmentId: "c4" },
+    ],
+    onApprove: { confirmation: "Draft ready — 42/53 pre-filled · 11 flagged for your review", audit: "Navigator · used SOC 2 doc (d4) · human review required before send" },
+    onDecline: { confirmation: "No draft created." },
+  },
+  "payroll": {
+    matches: ["payroll", "approve payroll", "gusto", "82,400", "82400"],
+    intent: "Approve Friday payroll",
+    proposals: [
+      { type: "payment", title: "Payroll approval — needs your approval", detail: "Gusto payroll run", amount: "$82,400.00", memo: "Covered by Thu Stripe payout ($41,300) + balance", sourceEmailId: "e16", highGate: true },
+    ],
+    onApprove: { confirmation: "Payroll approved for Friday — you'll confirm in Gusto", audit: "Navigator · 1 action (payroll) · consequential, human-gated · cash check passed (x7)" },
+    onDecline: { confirmation: "Payroll not approved. Nothing submitted." },
+  },
+  "intro-priya-alex": {
+    matches: ["intro", "priya", "alex", "fresno", "connect"],
+    intent: "Intro Priya to Alex at the Fresno depot",
+    proposals: [
+      { type: "email", title: "Proposed intro — Priya ⇄ Alex", to: "Priya Nair, Alex Reyes",
+        subject: "Priya (Northwind) ⇄ Alex (Fresno) — West Region rollout",
+        draft: "Alex, meet Priya — she'll own the Northwind rollout across your 4 depots and is fantastic. Priya, Alex runs ops at Fresno and will lead on their side. I'll let you two find time to scope go-live. Excited for this. — Maya",
+        sourceEmailId: "e15" },
+    ],
+    onApprove: { confirmation: "Intro sent — clears your overdue commitment to Priya", audit: "Navigator · 1 action · approved by Maya · resolves c3 (same-entity x3)" },
+    onDecline: { confirmation: "No intro sent. Draft saved." },
+  },
+  "sofia-offer": {
+    matches: ["sofia", "offer", "hire", "candidate", "she's got"],
+    intent: "Tell Sofia she's got the offer",
+    proposals: [
+      { type: "email", title: "Proposed reply to Sofia Renn", to: "Sofia Renn",
+        subject: "Re: Following up — Northwind offer",
+        draft: "Sofia — we'd love to have you. Your formal offer is on its way today, well ahead of your Friday deadline. I'm thrilled about what you'll build here. — Maya",
+        sourceEmailId: "e17" },
+      { type: "reminder", title: "Proposed task", detail: "Send Sofia the signed offer letter (draft d6)", when: "Today", linkedCommitmentId: "c8" },
+    ],
+    onApprove: { confirmation: "Reply sent to Sofia · offer-letter task added", audit: "Navigator · 2 actions · approved by Maya · beats her Fri deadline (c8)" },
+    onDecline: { confirmation: "Nothing sent. Draft saved." },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// SCENE 3 (extra) — the killer Reasoning questions. Merge into scene3.responses.
+// ---------------------------------------------------------------------------
+export const scene3ExtraResponses = {
+  "blocking-partner-meeting": {
+    matches: ["blocking", "partner meeting", "monday", "critical", "what's stuck", "chain"],
+    question: "What's blocking the partner meeting?",
+    answer:
+      "**One chain, not five problems.** Glenn briefs his partners Monday off your revised model.\n\n" +
+      "1. The model needs the **West Region numbers**.\n" +
+      "2. Those are stuck behind the **MSA liability-cap decision** (David needs it *today*).\n" +
+      "3. Cascade also won't countersign without the **security questionnaire** — which you can pre-fill from SOC 2.\n\n" +
+      "**Do this today:** approve the 9-month cap → David returns the redline tonight → Wei finalizes the model → Glenn's set for Monday. Everything else can wait.",
+    citations: [
+      { label: "Commitment c9 — MSA cap decision", commitmentIds: ["c9"] },
+      { label: "Doc — West Region pricing model", docId: "d5" },
+      { label: "Email — Glenn, Thursday call", emailId: "e21" },
+      { label: "Connection x1 — the critical path", connectionId: "x1" },
+    ],
+  },
+  "aws-spike": {
+    matches: ["aws", "bill", "why is", "spike", "cloud cost", "up 38"],
+    question: "Why is my AWS bill up?",
+    answer:
+      "**It's not a leak — it's the West Region load test.** Jane ran a full 4-depot simulation on staging Tuesday, which spun up extra EC2 and data transfer (+$5,210). The system held clean at 4x load. Nothing to fix; the spend was expected and it's a good sign for the rollout.",
+    citations: [
+      { label: "Email — Jane, load test heads-up", emailId: "e13" },
+      { label: "Money — AWS spike traced", moneyId: "m10" },
+      { label: "Connection x2 — reframe", connectionId: "x2" },
+    ],
+  },
+  "before-wedding": {
+    matches: ["wedding", "before i leave", "friday", "flight", "on my plate", "nina"],
+    question: "What's on my plate before I leave for the wedding?",
+    answer:
+      "You fly out **Friday 6:10 PM** for Nina's rehearsal dinner. To leave with a clear head, close these **today/Thu night**:\n\n" +
+      "• **MSA cap decision** → unblocks the model (do first).\n" +
+      "• **Approve payroll** (runs Fri; a Stripe payout lands Thu, so cash is fine).\n" +
+      "• **Sofia's offer** (her competing deadline is Friday).\n" +
+      "• **RSVP Nina's +1** (she's asked twice) and **intro Priya to Alex**.\n\n" +
+      "I've kept Friday clear so the deadline day doesn't eat your travel.",
+    citations: [
+      { label: "Life — flight & rehearsal dinner", lifeIds: ["L1", "L2"] },
+      { label: "Commitments c7, c8, c9, c10", commitmentIds: ["c7", "c8", "c9", "c10"] },
+      { label: "Connection x4 — the schedule conflict", connectionId: "x4" },
+    ],
+  },
+  "cascade-status": {
+    matches: ["cascade status", "status of cascade", "west region status", "where are we", "account status"],
+    question: "What's the status of the Cascade account?",
+    answer:
+      "**Cascade Freight — moving, with a clock on it.** Budget approved for a 4-depot Q3 rollout; $60k renewal due Aug 30 with expansion upside. **Watch-outs:** they're quietly pricing a competitor, and two things gate signature — the MSA cap and the security questionnaire. **Momentum:** Tomás is your champion, Alex (Fresno) is ready to scope, and Deepa at Harbor offered to be a reference. Close the MSA today and you're ahead of the competitor.",
+    citations: [
+      { label: "Email — Tomás, competing quote", emailId: "e14" },
+      { label: "Commitments c4, c9", commitmentIds: ["c4", "c9"] },
+      { label: "Connection x6 — competitor + reference", connectionId: "x6" },
+    ],
+  },
+  "who-havent-i-replied": {
+    matches: ["haven't i replied", "owe a reply", "unanswered", "who am i ignoring", "reply"],
+    question: "Who haven't I replied to?",
+    answer:
+      "**5 people are waiting on you**, most-urgent first: **David** (MSA cap — today), **Glenn** (confirm Thursday 2pm), **Sofia** (offer, Fri deadline), **Alex** (Fresno scoping), and **Nina** (the +1 RSVP). Three of these feed Monday's partner meeting; one is your best friend's wedding. Want me to draft all five?",
+    citations: [
+      { label: "Emails e22, e21, e17, e15, e19", emailIds: ["e22", "e21", "e17", "e15", "e19"] },
+    ],
+  },
+};
+
+// ---------------------------------------------------------------------------
+// MERGED ARRAYS — point components at these to use the full, richer dataset.
+// (Or spread the *Extra arrays into your originals above and delete these.)
+// ---------------------------------------------------------------------------
+export const allPeople      = [...people, ...peopleExtra];
+export const allEmails      = [...emails, ...emailsExtra];
+export const allCommitments = [...commitments, ...commitmentsExtra];
+export const allMoney       = [...money, ...moneyExtra];
+export const allDocuments   = [...documents, ...documentsExtra];

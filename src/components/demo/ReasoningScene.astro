@@ -3,12 +3,19 @@
 // return a structured answer assembled from the Foundation, each with
 // citations back into people / docs / emails. The moat: a blank-window
 // chatbot can't answer these. All scripted.
-import { scene3 } from '../../data/demo';
-import { persona } from '../../data/demo';
+import { scene3, scene3ExtraResponses, persona } from '../../data/demo';
 import type { Accent } from '../../lib/accents';
 import ProvenanceChip from './ProvenanceChip.astro';
 
-const responses = Object.entries(scene3.responses);
+// Merge the expansion pack (no schema change). Feature "What's blocking the
+// partner meeting?" first by inserting its key before the base responses.
+const featuredKey = 'blocking-partner-meeting';
+const responseMap: Record<string, any> = {
+  [featuredKey]: scene3ExtraResponses[featuredKey],
+  ...scene3.responses,
+  ...scene3ExtraResponses,
+};
+const responses = Object.entries(responseMap);
 
 // --- tiny markdown-lite: **bold** + "• " bullet lines + paragraphs ----------
 function renderInline(text: string): { t: string; b: boolean }[] {
@@ -17,33 +24,46 @@ function renderInline(text: string): { t: string; b: boolean }[] {
     .map((s, i) => ({ t: s, b: i % 2 === 1 }))
     .filter((p) => p.t.length > 0);
 }
-type Block = { type: 'p'; text: string } | { type: 'list'; items: string[] };
+type Block =
+  | { type: 'p'; text: string }
+  | { type: 'ul'; items: string[] }
+  | { type: 'ol'; items: { n: string; text: string }[] };
 function parseAnswer(answer: string): Block[] {
   const blocks: Block[] = [];
-  let list: string[] | null = null;
+  let ul: string[] | null = null;
+  let ol: { n: string; text: string }[] | null = null;
+  const flush = () => {
+    if (ul) { blocks.push({ type: 'ul', items: ul }); ul = null; }
+    if (ol) { blocks.push({ type: 'ol', items: ol }); ol = null; }
+  };
   for (const raw of answer.split('\n')) {
     const line = raw.trim();
+    const om = line.match(/^(\d+)\.\s+(.*)$/);
     if (line === '') {
-      if (list) { blocks.push({ type: 'list', items: list }); list = null; }
-      continue;
-    }
-    if (line.startsWith('•')) {
-      (list ??= []).push(line.replace(/^•\s*/, ''));
+      flush();
+    } else if (line.startsWith('•')) {
+      if (ol) { blocks.push({ type: 'ol', items: ol }); ol = null; }
+      (ul ??= []).push(line.replace(/^•\s*/, ''));
+    } else if (om) {
+      if (ul) { blocks.push({ type: 'ul', items: ul }); ul = null; }
+      (ol ??= []).push({ n: om[1], text: om[2] });
     } else {
-      if (list) { blocks.push({ type: 'list', items: list }); list = null; }
+      flush();
       blocks.push({ type: 'p', text: line });
     }
   }
-  if (list) blocks.push({ type: 'list', items: list });
+  flush();
   return blocks;
 }
 
-// Accent per citation source type (email / doc / money / commitment).
+// Accent per citation source type — supports every shape the expansion uses.
 function citationAccent(c: any): Accent {
-  if (c.emailId) return 'blue';
-  if (c.docId) return 'violet';
-  if (c.moneyId) return 'amber';
-  if (c.commitmentIds) return 'teal';
+  if (c.emailId || c.emailIds) return 'blue';
+  if (c.docId || c.docIds) return 'violet';
+  if (c.moneyId || c.moneyIds) return 'amber';
+  if (c.commitmentId || c.commitmentIds) return 'teal';
+  if (c.lifeId || c.lifeIds) return 'rose';
+  if (c.connectionId || c.connectionIds) return 'green';
   return 'violet';
 }
 ---
@@ -67,8 +87,16 @@ function citationAccent(c: any): Accent {
           <button
             type="button"
             data-reason-chip={key}
-            class="rounded-full border border-border bg-bg px-3.5 py-1.5 text-[13px] font-medium text-ink-2 transition-colors hover:border-primary hover:text-primary focus-visible:outline-2"
+            class:list={[
+              'rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-2',
+              key === featuredKey
+                ? 'border-primary bg-primary-50 text-primary-700 hover:bg-primary-50'
+                : 'border-border bg-bg text-ink-2 hover:border-primary hover:text-primary',
+            ]}
           >
+            {key === featuredKey && (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="mr-1 inline-block align-[-1px]" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" /></svg>
+            )}
             {r.question}
           </button>
         ))
@@ -126,20 +154,33 @@ function citationAccent(c: any): Accent {
               </div>
 
               <div class="space-y-3 px-5 py-4 text-[14.5px] leading-relaxed text-ink-2">
-                {parseAnswer(r.answer).map((block) =>
-                  block.type === 'p' ? (
-                    <p>{renderInline(block.text).map((s) => (s.b ? <strong class="font-semibold text-ink">{s.t}</strong> : s.t))}</p>
-                  ) : (
-                    <ul class="space-y-1.5">
-                      {block.items.map((item) => (
-                        <li class="flex gap-2">
-                          <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/50" />
-                          <span>{renderInline(item).map((s) => (s.b ? <strong class="font-semibold text-ink">{s.t}</strong> : s.t))}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )
-                )}
+                {parseAnswer(r.answer).map((block) => (
+                  <>
+                    {block.type === 'p' && (
+                      <p>{renderInline(block.text).map((s) => (s.b ? <strong class="font-semibold text-ink">{s.t}</strong> : s.t))}</p>
+                    )}
+                    {block.type === 'ul' && (
+                      <ul class="space-y-1.5">
+                        {block.items.map((item) => (
+                          <li class="flex gap-2">
+                            <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/50" />
+                            <span>{renderInline(item).map((s) => (s.b ? <strong class="font-semibold text-ink">{s.t}</strong> : s.t))}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {block.type === 'ol' && (
+                      <ol class="space-y-1.5">
+                        {block.items.map((item) => (
+                          <li class="flex gap-2.5">
+                            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-50 text-[11px] font-semibold text-primary-700">{item.n}</span>
+                            <span>{renderInline(item.text).map((s) => (s.b ? <strong class="font-semibold text-ink">{s.t}</strong> : s.t))}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </>
+                ))}
               </div>
 
               <!-- citations -->

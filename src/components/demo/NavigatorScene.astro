@@ -3,18 +3,28 @@
 // Matches the visual language of NavigatorApproval.astro, made interactive:
 // prompt chips + fuzzy-matched free-text reveal a proposal card; the user
 // approves, edits, or declines; approval appends an audit line. All scripted.
-import { scene2 } from '../../data/demo';
+import { scene2, scene2ExtraResponses, scene2ExtraPrompts } from '../../data/demo';
 import { emailProvenance } from '../../lib/demo';
 import { accent as accentMap, type Accent } from '../../lib/accents';
 import ProvenanceChip from './ProvenanceChip.astro';
 
-const responses = Object.entries(scene2.responses);
+// Merge the expansion pack in (no schema change, no renames): extra intents
+// become both fuzzy-match targets and chips.
+const responseMap: Record<string, any> = { ...scene2.responses, ...scene2ExtraResponses };
+const responses = Object.entries(responseMap);
+const suggestedPrompts = [...scene2.suggestedPrompts, ...scene2ExtraPrompts];
+// Chips are the suggested prompts, mapped to their response key by intent.
+const keyForIntent = (intent: string) => responses.find(([, r]) => r.intent === intent)?.[0];
+const chips = suggestedPrompts
+  .map((label) => ({ label, key: keyForIntent(label) }))
+  .filter((c): c is { label: string; key: string } => Boolean(c.key));
 
 // Icon + accent per proposal type (kept out of the data file).
 const typeMeta: Record<string, { accent: Accent; label: string; paths: string[] }> = {
   email: { accent: 'blue', label: 'Email', paths: ['M4 6h16v12H4z', 'M4 7l8 6 8-6'] },
   reminder: { accent: 'violet', label: 'Reminder', paths: ['M4 5h16v15H4z', 'M4 9h16', 'M8 3v4', 'M16 3v4'] },
   payment: { accent: 'amber', label: 'Payment', paths: ['M12 3v18', 'M8 8h5a2.5 2.5 0 010 5H9a2.5 2.5 0 000 5h6'] },
+  document: { accent: 'violet', label: 'Document', paths: ['M6 3h8l4 4v14H6z', 'M14 3v4h4'] },
 };
 ---
 
@@ -33,13 +43,13 @@ const typeMeta: Record<string, { accent: Accent; label: string; paths: string[] 
     <p class="mb-2.5 text-xs font-semibold uppercase tracking-wide text-muted">Try an intent</p>
     <div class="flex flex-wrap gap-2">
       {
-        responses.map(([key, r]) => (
+        chips.map((chip) => (
           <button
             type="button"
-            data-nav-chip={key}
+            data-nav-chip={chip.key}
             class="rounded-full border border-border bg-bg px-3.5 py-1.5 text-[13px] font-medium text-ink-2 transition-colors hover:border-primary hover:text-primary focus-visible:outline-2"
           >
-            {r.intent}
+            {chip.label}
           </button>
         ))
       }
@@ -72,7 +82,7 @@ const typeMeta: Record<string, { accent: Accent; label: string; paths: string[] 
     </p>
 
     {
-      responses.map(([key, r]) => (
+      responses.map(([key, r]: [string, any]) => (
         <div data-nav-response={key} data-nav-match={r.matches.join('|')} hidden>
           <div class="mx-auto max-w-xl">
             <figure
@@ -126,6 +136,13 @@ const typeMeta: Record<string, { accent: Accent; label: string; paths: string[] 
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border px-4 py-3 text-[13px] text-ink-2">
                           <span class="text-ink">{p.detail}</span>
                           <span class="rounded-full bg-primary-50 px-2 py-0.5 text-[11.5px] font-medium text-primary-700">{p.when}</span>
+                        </div>
+                      )}
+
+                      {p.type === 'document' && (
+                        <div class="border-t border-border px-4 py-3">
+                          <p class="text-[13px] text-ink">{p.detail}</p>
+                          {p.sourceEmailId && <div class="mt-2"><ProvenanceChip label={emailProvenance(p.sourceEmailId)} accent="violet" quiet /></div>}
                         </div>
                       )}
 

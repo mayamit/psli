@@ -3,11 +3,14 @@
 // with zero user input, PSL/i has already read the inbox and surfaces who's
 // owed a reply, what Maya promised, and money buried in email — each with
 // provenance, each expandable to its source + resolved facts.
-import { persona, emails, scene1 } from '../../data/demo';
-import { emailById, commitmentById, moneyById, personById, personAccent, emailProvenance, statusMeta, moneyMeta } from '../../lib/demo';
+import { persona, allEmails, scene1 } from '../../data/demo';
+import { emailById, commitmentById, moneyById, personById, personAccent, emailProvenance, statusMeta, moneyMeta, connectionById } from '../../lib/demo';
 import { accent as accentMap } from '../../lib/accents';
 import ProvenanceChip from './ProvenanceChip.astro';
 import SourceReveal from './SourceReveal.astro';
+
+// Insight banner headlined on load — defaults to the AWS reframe (connection x2).
+const insight = connectionById['x2'];
 
 const columnMeta: Record<string, { dot: string; hint: string; icon: string }> = {
   replies: { dot: 'bg-primary', hint: 'Ranked by who’s waiting on you', icon: 'M4 6h16v12H4z|M4 7l8 6 8-6' },
@@ -40,6 +43,24 @@ const columns = scene1.sections.map((s) => ({
     <p class="mt-2 max-w-2xl text-[15px] text-ink-2">{scene1.sub}</p>
   </div>
 
+  <!-- Insight banner — the "how did it know that" moment, surfaced on load -->
+  {insight && (
+    <div class="mb-5 overflow-hidden rounded-[var(--radius-card)] border border-primary/25 shadow-[var(--shadow-card)]" style="background:linear-gradient(135deg,rgba(106,92,246,.09),rgba(139,124,248,.05))">
+      <div class="flex items-start gap-3 px-4 py-3.5 sm:px-5">
+        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--grad)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" />
+          </svg>
+        </span>
+        <div class="min-w-0">
+          <p class="text-[11px] font-semibold uppercase tracking-wide text-primary-700">PSL/i noticed</p>
+          <p class="mt-0.5 text-[15px] font-medium text-ink">{insight.insight}</p>
+          <p class="mt-1 text-[13.5px] text-ink-2">{insight.payoff}</p>
+        </div>
+      </div>
+    </div>
+  )}
+
   <!-- The product surface -->
   <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-bg shadow-[var(--shadow-lift)]">
     <!-- surface toolbar -->
@@ -52,7 +73,7 @@ const columns = scene1.sections.map((s) => ({
         </span>
         <div class="leading-tight">
           <p class="text-sm font-semibold text-ink">Today · {persona.today}</p>
-          <p class="text-[11.5px] text-muted">Resolved from {emails.length} emails · you set up nothing</p>
+          <p class="text-[11.5px] text-muted">Resolved from {allEmails.length} emails · you set up nothing</p>
         </div>
       </div>
       <span class="hidden items-center gap-1.5 rounded-full border border-c-green/30 bg-c-green/10 px-2.5 py-1 text-[11px] font-semibold text-c-green-700 sm:inline-flex">
