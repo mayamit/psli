@@ -1,49 +1,62 @@
 ---
-// The /demo shell: framing + sample-data disclaimer, persona context, a scene
-// switcher, a persistent Cloud / Home-Server toggle, and the scene panels.
+// The /demo shell: a guided linear flow (Intro → Communications → Navigator →
+// Reasoning) with free tab navigation, a 4-dot progress indicator, a persistent
+// Back / Next step-nav, and a Cloud / Home-Server toggle. Scene 0 orients the
+// visitor; the furthest step reached is remembered so returns skip the intro.
 // Interactivity is a small vanilla-JS island (this page is the JS exception).
-import { persona, disclaimer, tiers, scene1, scene2, scene3, cta } from '../../data/demo';
+import { persona, disclaimer, tiers, scene0, scene1, scene2, scene3, cta } from '../../data/demo';
 import { accent as accentMap, type Accent } from '../../lib/accents';
+import { href } from '../../lib/url';
 import Button from '../Button.astro';
 import CommsScene from './CommsScene.astro';
 import NavigatorScene from './NavigatorScene.astro';
 import ReasoningScene from './ReasoningScene.astro';
 
 const tabs = [
-  { n: '1', label: 'Communications', sub: scene1.eyebrow },
-  { n: '2', label: 'Navigator', sub: scene2.eyebrow },
-  { n: '3', label: 'Reasoning', sub: scene3.eyebrow },
+  { n: '1', label: 'Communications' },
+  { n: '2', label: 'Navigator' },
+  { n: '3', label: 'Reasoning' },
+];
+
+// Progress dots — includes the Intro step (which has no lens tab).
+const progress = [
+  { n: 0, label: 'Intro' },
+  { n: 1, label: 'Communications' },
+  { n: 2, label: 'Navigator' },
+  { n: 3, label: 'Reasoning' },
 ];
 
 const personaAccent: Accent = 'violet';
 const pa = accentMap[personaAccent];
+
+// Shared button styles (mirrors Button.astro primary — reused for JS-driven nav).
+const primaryBtn =
+  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-btn)] px-5 py-3 text-[15px] font-semibold transition-all duration-200 bg-primary text-white shadow-[var(--shadow-card)] hover:bg-primary-700 hover:-translate-y-0.5';
 ---
 
-<div class="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
-  <!-- Framing -->
-  <div class="max-w-2xl">
-    <span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-ink-2">
-      <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-      Interactive demo
-    </span>
-    <h1 class="mt-3 text-3xl font-semibold text-ink sm:text-[40px] sm:leading-[1.08]">
-      Watch PSL/i work over a founder's week.
-    </h1>
-    <p class="mt-3 text-[17px] text-ink-2">
-      No signup, no setup. You're stepping into an already-resolved Foundation and seeing what PSL/i
-      surfaces, proposes, and answers — with the source behind every fact.
-    </p>
-  </div>
+<div id="demo-root" class="mx-auto w-full max-w-6xl px-5 pb-24 pt-10 sm:px-8 sm:pt-14" data-waitlist={href(cta.href)}>
+  <!-- Progress indicator + sample-data disclaimer -->
+  <div id="demo-top" class="flex flex-col gap-3 scroll-mt-24 sm:flex-row sm:items-center sm:justify-between">
+    <ol class="flex items-center gap-1.5 sm:gap-2" aria-label="Demo progress">
+      {
+        progress.map((s, i) => (
+          <li class="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              data-goto={s.n}
+              data-progress-step={s.n}
+              aria-current={s.n === 0 ? 'step' : 'false'}
+              class="group flex items-center gap-1.5 rounded-full py-1 transition-colors focus-visible:outline-2"
+            >
+              <span data-dot class="h-2.5 w-2.5 shrink-0 rounded-full transition-all" style={s.n === 0 ? 'background:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-50)' : 'background:var(--color-border)'}></span>
+              <span data-dot-label class="hidden text-[11.5px] transition-colors sm:inline" style={s.n === 0 ? 'color:var(--color-ink);font-weight:600' : 'color:var(--color-muted);font-weight:500'}>{s.label}</span>
+            </button>
+            {i < progress.length - 1 && <span class="h-px w-4 bg-border sm:w-6" aria-hidden="true"></span>}
+          </li>
+        ))
+      }
+    </ol>
 
-  <!-- Persona context + sample-data disclaimer -->
-  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <div class="inline-flex items-center gap-3 rounded-[var(--radius-card)] border border-border bg-surface px-4 py-2.5 shadow-[var(--shadow-card)]">
-      <span class={`flex h-10 w-10 items-center justify-center rounded-[10px] text-sm font-semibold ${pa.softBg} ${pa.text}`}>MC</span>
-      <div class="leading-tight">
-        <p class="text-sm font-semibold text-ink">You're viewing {persona.name}'s PSL/i</p>
-        <p class="text-xs text-muted">{persona.role} · {persona.company} — {persona.companyBlurb}</p>
-      </div>
-    </div>
     <p class="inline-flex items-center gap-2 self-start rounded-full border border-border bg-bg px-3 py-1.5 text-xs text-muted sm:self-auto">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" class="shrink-0 text-primary" aria-hidden="true">
         <path d="M12 3l7 4v6c0 4-3 6-7 8-4-2-7-4-7-8V7l7-4z" stroke="currentColor" stroke-width="2" />
@@ -52,18 +65,18 @@ const pa = accentMap[personaAccent];
     </p>
   </div>
 
-  <!-- Controls: scene tabs + Cloud/Home-Server toggle -->
-  <div class="mt-8 flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
+  <!-- Controls: scene tabs (free nav) + Cloud/Home-Server toggle -->
+  <div class="mt-5 flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
     <div class="inline-flex gap-1 rounded-[12px] border border-border bg-bg p-1" role="tablist" aria-label="Demo scenes">
       {
-        tabs.map((t, i) => (
+        tabs.map((t) => (
           <button
             type="button"
             role="tab"
             id={`tab-${t.n}`}
             data-scene={t.n}
             aria-controls={`panel-${t.n}`}
-            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-selected="false"
             class="flex items-center gap-2 rounded-[9px] px-3 py-2 text-left text-[13px] font-semibold text-muted transition-colors hover:text-ink-2 aria-selected:bg-surface aria-selected:text-ink aria-selected:shadow-[var(--shadow-card)]"
           >
             <span class="flex h-5 w-5 items-center justify-center rounded-full bg-primary-50 text-[11px] text-primary-700">{t.n}</span>
@@ -94,17 +107,85 @@ const pa = accentMap[personaAccent];
 
   <!-- Scene panels -->
   <div class="mt-8">
-    <div id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+    <!-- Scene 0 — orientation -->
+    <div id="panel-0" data-panel="0" role="region" aria-label="Introduction">
+      <div class="max-w-3xl">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-ink-2">
+          <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+          {scene0.eyebrow}
+        </span>
+        <h1 class="mt-3 text-3xl font-semibold text-ink sm:text-[40px] sm:leading-[1.08]">{scene0.title}</h1>
+
+        <div class="mt-6 inline-flex items-center gap-3 rounded-[var(--radius-card)] border border-border bg-surface px-4 py-2.5 shadow-[var(--shadow-card)]">
+          <span class={`flex h-10 w-10 items-center justify-center rounded-[10px] text-sm font-semibold ${pa.softBg} ${pa.text}`}>MC</span>
+          <div class="leading-tight">
+            <p class="text-sm font-semibold text-ink">You're viewing {persona.name}'s PSL/i</p>
+            <p class="text-xs text-muted">{persona.role} · {persona.company} — {persona.companyBlurb}</p>
+          </div>
+        </div>
+
+        <p class="mt-5 text-[17px] leading-relaxed text-ink-2">{scene0.setup}</p>
+      </div>
+
+      <!-- Three steps preview (mirrors the scene tabs) -->
+      <div class="mt-8 grid gap-3 sm:grid-cols-3">
+        {
+          scene0.steps.map((s) => (
+            <button
+              type="button"
+              data-goto={s.n}
+              class="group flex flex-col rounded-[var(--radius-card)] border border-border bg-surface p-4 text-left shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:border-primary/40 focus-visible:outline-2"
+            >
+              <span class="flex items-center gap-2">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary-50 text-[12px] font-semibold text-primary-700">{s.n}</span>
+                <span class="text-[15px] font-semibold text-ink">{s.lens}</span>
+              </span>
+              <span class="mt-2 text-[13px] leading-relaxed text-ink-2">{s.line}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- How to read this demo -->
+      <div class="mt-8 max-w-2xl rounded-[var(--radius-card)] border border-border bg-bg p-5">
+        <p class="text-[11.5px] font-semibold uppercase tracking-wide text-muted">How to read this demo</p>
+        <ul class="mt-3 flex flex-col gap-2">
+          {
+            scene0.howto.map((h) => (
+              <li class="flex items-start gap-2.5 text-[14px] text-ink-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="mt-0.5 shrink-0 text-primary" aria-hidden="true">
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>{h}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="mt-8">
+        <button type="button" data-goto="1" class={primaryBtn}>{scene0.cta}</button>
+      </div>
+    </div>
+
+    <!-- Scene 1–3 -->
+    <div id="panel-1" data-panel="1" role="tabpanel" aria-labelledby="tab-1" hidden>
       <CommsScene />
     </div>
-
-    <div id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+    <div id="panel-2" data-panel="2" role="tabpanel" aria-labelledby="tab-2" hidden>
       <NavigatorScene />
     </div>
-
-    <div id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+    <div id="panel-3" data-panel="3" role="tabpanel" aria-labelledby="tab-3" hidden>
       <ReasoningScene />
     </div>
+  </div>
+
+  <!-- Persistent step nav (Back / Next) — hidden on the Intro step -->
+  <div data-stepnav class="mt-10 flex items-center justify-between gap-3 border-t border-border pt-6" hidden>
+    <button type="button" data-back class="inline-flex items-center gap-1.5 text-[14px] font-semibold text-ink-2 transition-colors hover:text-primary focus-visible:outline-2">
+      ← Back
+    </button>
+    <button type="button" data-next data-mode="scene" class={primaryBtn}>Next →</button>
   </div>
 
   <!-- Handoff to the (open) waitlist -->
@@ -118,41 +199,123 @@ const pa = accentMap[personaAccent];
 </div>
 
 <script>
-  // --- Scene switching -------------------------------------------------------
-  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-scene]'));
-  const panels = Array.from(document.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+  const KEY = 'psli-demo-furthest';
+  const LABELS = ['Intro', 'Communications', 'Navigator', 'Reasoning'];
 
-  function selectScene(n: string) {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.scene === n)));
-    panels.forEach((p) => {
-      p.hidden = p.id !== `panel-${n}`;
+  const root = document.getElementById('demo-root');
+  const top = document.getElementById('demo-top');
+  if (root && top) {
+    const waitlist = root.dataset.waitlist ?? '/waitlist';
+    const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+    const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-scene]'));
+    const gotos = Array.from(document.querySelectorAll<HTMLElement>('[data-goto]'));
+    const progSteps = Array.from(document.querySelectorAll<HTMLElement>('[data-progress-step]'));
+    const stepnav = document.querySelector<HTMLElement>('[data-stepnav]');
+    const backBtn = document.querySelector<HTMLButtonElement>('[data-back]');
+    const nextBtn = document.querySelector<HTMLButtonElement>('[data-next]');
+
+    let current = 0;
+    let furthest = 0;
+
+    function renderProgress() {
+      progSteps.forEach((item) => {
+        const n = Number(item.dataset.progressStep);
+        const dot = item.querySelector<HTMLElement>('[data-dot]');
+        const label = item.querySelector<HTMLElement>('[data-dot-label]');
+        item.setAttribute('aria-current', n === current ? 'step' : 'false');
+        if (!dot || !label) return;
+        if (n === current) {
+          dot.style.background = 'var(--color-primary)';
+          dot.style.boxShadow = '0 0 0 3px var(--color-primary-50)';
+          label.style.color = 'var(--color-ink)';
+          label.style.fontWeight = '600';
+        } else if (n < current) {
+          dot.style.background = 'var(--color-primary)';
+          dot.style.boxShadow = 'none';
+          label.style.color = 'var(--color-ink-2)';
+          label.style.fontWeight = '500';
+        } else {
+          dot.style.background = 'var(--color-border)';
+          dot.style.boxShadow = 'none';
+          label.style.color = 'var(--color-muted)';
+          label.style.fontWeight = '500';
+        }
+      });
+    }
+
+    function renderNav() {
+      if (!stepnav || !nextBtn) return;
+      if (current === 0) {
+        stepnav.hidden = true;
+        return;
+      }
+      stepnav.hidden = false;
+      if (current < 3) {
+        nextBtn.textContent = `Next: ${LABELS[current + 1]} →`;
+        nextBtn.dataset.mode = 'scene';
+      } else {
+        nextBtn.textContent = 'Request early access →';
+        nextBtn.dataset.mode = 'waitlist';
+      }
+    }
+
+    function render() {
+      panels.forEach((p) => {
+        p.hidden = Number(p.dataset.panel) !== current;
+      });
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(Number(t.dataset.scene) === current)));
+      renderProgress();
+      renderNav();
+    }
+
+    function goTo(step: number, opts: { scroll?: boolean } = {}) {
+      current = Math.max(0, Math.min(3, step));
+      if (current > furthest) {
+        furthest = current;
+        try { localStorage.setItem(KEY, String(furthest)); } catch {}
+      }
+      render();
+      if (opts.scroll !== false) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Any element with data-goto jumps directly (progress dots, preview steps, Start CTA).
+    gotos.forEach((el) => el.addEventListener('click', () => goTo(Number(el.dataset.goto))));
+
+    // Tabs (free navigation across the three lenses) + arrow-key roving focus.
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => goTo(Number(tab.dataset.scene)));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        const dir = e.key === 'ArrowRight' ? 1 : -1;
+        const next = tabs[(i + dir + tabs.length) % tabs.length];
+        next.focus();
+        goTo(Number(next.dataset.scene));
+      });
+    });
+
+    backBtn?.addEventListener('click', () => goTo(current - 1));
+    nextBtn?.addEventListener('click', () => {
+      if (nextBtn.dataset.mode === 'waitlist') window.location.href = waitlist;
+      else goTo(current + 1);
+    });
+
+    // Default to Scene 0; a returning visitor who has been past the intro skips it.
+    try { furthest = parseInt(localStorage.getItem(KEY) || '0', 10) || 0; } catch { furthest = 0; }
+    goTo(furthest >= 1 ? 1 : 0, { scroll: false });
+
+    // --- Cloud / Home-Server toggle (positioning flourish; data unchanged) ----
+    const tierBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tier]'));
+    const tierNote = document.getElementById('tier-note');
+    const notes: Record<string, string> = {
+      Cloud: 'Cloud: encrypted and isolated per user.',
+      'Home Server': 'Home Server: your data never leaves the house.',
+    };
+    tierBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        tierBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        if (tierNote) tierNote.textContent = notes[btn.dataset.tier!] ?? '';
+      });
     });
   }
-
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => selectScene(tab.dataset.scene!));
-    // Arrow-key roving focus for the tablist (WCAG)
-    tab.addEventListener('keydown', (e) => {
-      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-      e.preventDefault();
-      const dir = e.key === 'ArrowRight' ? 1 : -1;
-      const next = tabs[(i + dir + tabs.length) % tabs.length];
-      next.focus();
-      selectScene(next.dataset.scene!);
-    });
-  });
-
-  // --- Cloud / Home-Server toggle (positioning flourish; data unchanged) -----
-  const tierBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tier]'));
-  const tierNote = document.getElementById('tier-note');
-  const notes: Record<string, string> = {
-    Cloud: 'Cloud: encrypted and isolated per user.',
-    'Home Server': 'Home Server: your data never leaves the house.',
-  };
-  tierBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      tierBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      if (tierNote) tierNote.textContent = notes[btn.dataset.tier!] ?? '';
-    });
-  });
 </script>

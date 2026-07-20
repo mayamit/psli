@@ -685,3 +685,23 @@ export const allEmails      = [...emails, ...emailsExtra];
 export const allCommitments = [...commitments, ...commitmentsExtra];
 export const allMoney       = [...money, ...moneyExtra];
 export const allDocuments   = [...documents, ...documentsExtra];
+
+
+// SCENE 0 — Orientation / set the scene (shown before Communications)
+export const scene0 = {
+  eyebrow: "Interactive demo · about 90 seconds",
+  title: "Meet Maya. It's Thursday — and her week looks like chaos.",
+  setup:
+    "Maya runs Northwind, a seed-stage startup. Her lead investor briefs his partners on Monday, a key deal is mid-negotiation, payroll runs Friday, a top candidate has a competing offer — and she flies out Friday night for her best friend's wedding. Most tools would show her a pile of unread email. PSL/i has already made sense of it.",
+  steps: [
+    { n: 1, lens: "Communications", line: "PSL/i has already read her inbox and resolved it — who's waiting, what she promised, what's owed. She set up nothing." },
+    { n: 2, lens: "Navigator",      line: "She says what she wants in plain language. PSL/i proposes the exact action and waits for her approval." },
+    { n: 3, lens: "Reasoning",      line: "She asks questions over her own life. Every answer is assembled from her Foundation, with the source behind each claim." },
+  ],
+  howto: [
+    "Everything here is sample data — nothing real, nothing leaves the house.",
+    "Click any fact to see the email it was resolved from.",
+    "Switch Cloud / Home Server any time — same product, your choice of where data lives.",
+  ],
+  cta: "Start with Communications →",
+};
