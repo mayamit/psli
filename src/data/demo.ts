@@ -191,7 +191,7 @@ export const scene1 = {
   title: `Good morning, Maya. Here's what needs you.`,
   sub: "PSL/i read your inbox and resolved it. Nothing was set up — this is your first open.",
   sections: [
-    { key: "replies",     label: "Owed a reply",     itemIds: ["e1", "e3", "e7"] },      // email ids, ranked
+    { key: "replies",     label: "Owed a reply",     itemIds: ["e22", "e21", "e17", "e15", "e19"] },  // David, Glenn, Sofia, Alex, Nina — urgency order (canonical set of 5)
     { key: "commitments", label: "You promised",     itemIds: ["c3", "c1", "c2"] },      // commitment ids (overdue first)
     { key: "money",       label: "Money in your inbox", itemIds: ["m1", "m3", "m4"] },   // money ids
   ],
