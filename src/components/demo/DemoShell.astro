@@ -11,11 +11,13 @@ import Button from '../Button.astro';
 import CommsScene from './CommsScene.astro';
 import NavigatorScene from './NavigatorScene.astro';
 import ReasoningScene from './ReasoningScene.astro';
+import VisionScene from './VisionScene.astro';
 
 const tabs = [
   { n: '1', label: 'Communications' },
   { n: '2', label: 'Navigator' },
   { n: '3', label: 'Reasoning' },
+  { n: '4', label: 'Full picture' },
 ];
 
 // Progress dots — includes the Intro step (which has no lens tab).
@@ -24,6 +26,7 @@ const progress = [
   { n: 1, label: 'Communications' },
   { n: 2, label: 'Navigator' },
   { n: 3, label: 'Reasoning' },
+  { n: 4, label: 'Full picture' },
 ];
 
 const personaAccent: Accent = 'violet';
@@ -178,6 +181,9 @@ const primaryBtn =
     <div id="panel-3" data-panel="3" role="tabpanel" aria-labelledby="tab-3" hidden>
       <ReasoningScene />
     </div>
+    <div id="panel-4" data-panel="4" role="tabpanel" aria-labelledby="tab-4" hidden>
+      <VisionScene />
+    </div>
   </div>
 
   <!-- Persistent step nav (Back / Next) — hidden on the Intro step -->
@@ -200,7 +206,8 @@ const primaryBtn =
 
 <script>
   const KEY = 'psli-demo-furthest';
-  const LABELS = ['Intro', 'Communications', 'Navigator', 'Reasoning'];
+  const LABELS = ['Intro', 'Communications', 'Navigator', 'Reasoning', 'Full picture'];
+  const LAST = LABELS.length - 1; // final step (Full picture) → hands off to the waitlist
 
   const root = document.getElementById('demo-root');
   const top = document.getElementById('demo-top');
@@ -250,7 +257,7 @@ const primaryBtn =
         return;
       }
       stepnav.hidden = false;
-      if (current < 3) {
+      if (current < LAST) {
         nextBtn.textContent = `Next: ${LABELS[current + 1]} →`;
         nextBtn.dataset.mode = 'scene';
       } else {
@@ -269,7 +276,7 @@ const primaryBtn =
     }
 
     function goTo(step: number, opts: { scroll?: boolean } = {}) {
-      current = Math.max(0, Math.min(3, step));
+      current = Math.max(0, Math.min(LAST, step));
       if (current > furthest) {
         furthest = current;
         try { localStorage.setItem(KEY, String(furthest)); } catch {}

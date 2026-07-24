@@ -253,6 +253,17 @@ const typeMeta: Record<string, { accent: Accent; label: string; paths: string[] 
       chip.addEventListener('click', () => show(chip.getAttribute('data-nav-chip')!));
     });
 
+    // Cross-lens routing: the Full-picture surface asks us to load a specific
+    // intent by key (dispatched after DemoShell switches to this panel).
+    document.addEventListener('demo:goto-nav', (e) => {
+      const key = (e as CustomEvent).detail?.key;
+      const target = key && responses.find((p) => p.getAttribute('data-nav-response') === key);
+      if (target) {
+        show(key);
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
     // Free-text fuzzy match
     form?.addEventListener('submit', (e) => {
       e.preventDefault();

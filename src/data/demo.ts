@@ -705,3 +705,173 @@ export const scene0 = {
   ],
   cta: "Start with Communications →",
 };
+
+
+// ============================================================================
+// PSL/i — DEMO "YOUR DAY" HOME  (additive — paste at the END of src/data/demo.ts)
+// ----------------------------------------------------------------------------
+// Glenn's note: a person wants to FEEL in control of their day. Lead with a
+// calm overview (Navigator on top), then let them choose where to start.
+// V1-honest: this summarizes the two V1 lenses' data — it is NOT the V3 work
+// surface. A quiet teaser points to the V3 vision on /vision.
+// ============================================================================
+
+export const home = {
+  greeting: "Good morning, Maya.",
+  navigatorPrompt: "What do you want to do?",
+  // The Navigator bar on the home uses these example chips (same as scene2).
+  // Clicking one (or typing) should jump to the Navigator lens with it loaded.
+
+  glanceTitle: "Your day at a glance",
+  glanceSub: "PSL/i read and resolved everything overnight. You set up nothing.",
+  stats: [
+    { label: "Waiting on you", value: "5",              sub: "people owed a reply",              accent: "blue",  tone: "attention" },
+    { label: "Need attention", value: "6",              sub: "commitments · 2 overdue",          accent: "amber", tone: "warn" },
+    { label: "Money",          value: "$94k out · $41k in", sub: "payroll Fri · Stripe payout Thu",  accent: "green", tone: "info" },
+    { label: "Schedule",       value: "1 conflict",     sub: "Fri deadline vs. 6:10pm flight",   accent: "rose",  tone: "warn" },
+  ],
+
+  // The "feel in control" moment: PSL/i names the through-line of the week.
+  priorityHeadline: {
+    kicker: "PSL/i sees the through-line",
+    text: "One chain, not five problems — today's MSA decision unblocks Glenn's model for Monday's partner meeting.",
+    connectionId: "x1", // links to the critical-path connection
+    cta: "See what's blocking Monday", // routes to Reasoning → "What's blocking the partner meeting?"
+  },
+
+  startPrompt: "Where do you want to start your day?",
+  lenses: [
+    { n: 1, key: "communications", title: "Communications", line: "See what your inbox already resolved — who's waiting, what you promised, what's owed.", count: "26 emails resolved" },
+    { n: 2, key: "navigator",      title: "Navigator",      line: "Tell PSL/i what to do. It proposes the exact action and waits for your approval.",       count: "8 intents ready" },
+    { n: 3, key: "reasoning",      title: "Reasoning",      line: "Ask anything over your life. Every answer traces back to its source.",                    count: "ask your Foundation" },
+  ],
+
+  // Honest-now, ambitious-later. Shows the V3 image as VISION, not V1.
+  visionTeaser: {
+    label: "Where this is heading",
+    text: "Today, PSL/i is two lenses over your existing apps. The universal work surface — one calm home for your whole digital life — is the vision.",
+    href: "/vision",
+    image: "/assets/UI_Work_Surface_V3_VISION.jpeg", // already in public/assets — use the base-aware url() helper
+  },
+};
+
+
+// ============================================================================
+// PSL/i — DEMO V3 "FULL PICTURE" DASHBOARD  (additive — paste at END of demo.ts)
+// ----------------------------------------------------------------------------
+// The finale reveal, AFTER the three lenses, BEFORE the CTA.
+// Recreated work surface populated with Maya's data. Badged "V3 · Vision" as a
+// whole; every tile is interactive (opens a detail drawer). Not the V1 product.
+// Reuses allPeople / allEmails / allCommitments / allMoney / allDocuments,
+// plus `connections`, `lifeItems`, `storyline` from earlier blocks.
+// ============================================================================
+
+// --- New supporting data the tiles need -------------------------------------
+export type Project = {
+  id: string;
+  name: string;
+  status: "on-track" | "at-risk" | "active";
+  detail: string;
+  personIds: string[];
+  linkedCommitmentIds?: string[];
+};
+
+export const projects: Project[] = [
+  { id: "pr1", name: "West Region rollout (Cascade)", status: "at-risk", detail: "4 depots (Reno, Fresno, Boise, Spokane) · Q3 go-live · gated by MSA + security questionnaire", personIds: ["tomás", "priya", "alex"], linkedCommitmentIds: ["c2", "c3", "c4", "c5", "c9"] },
+  { id: "pr2", name: "Harbor Logistics expansion",     status: "active",  detail: "2 new depots in Q4 · seat expansion (~$28k) · one open export bug",                     personIds: ["deepa"] },
+  { id: "pr3", name: "Seed close / Monday partner update", status: "active", detail: "Revised model to Glenn Fri · partners review Mon · runway ~14 mo",                     personIds: ["glenn", "wei"], linkedCommitmentIds: ["c1"] },
+];
+
+export type AgendaItem = { time: string; label: string; kind: "meeting" | "focus" | "travel" | "proposed"; note?: string };
+
+export const agenda: AgendaItem[] = [
+  { time: "9:00 AM",  label: "Northwind standup",                 kind: "meeting" },
+  { time: "10:30 AM", label: "1:1 with Jane (CTO)",               kind: "meeting" },
+  { time: "2:00 PM",  label: "Glenn pre-align call",              kind: "proposed", note: "Navigator can confirm" },
+  { time: "4:00 PM",  label: "Focus: MSA decision + model",       kind: "focus",   note: "Unblocks Monday" },
+  { time: "Fri 6:10 PM", label: "Flight SFO→AUS (Nina's wedding)", kind: "travel",  note: "Conflicts with Fri model deadline" },
+];
+
+// --- The dashboard itself ---------------------------------------------------
+export type VisionTile = {
+  key: string;
+  title: string;
+  accent: string;         // token accent key
+  primary: string;        // headline count
+  secondary: string;      // sub count
+  drawer: {
+    title: string;
+    sourceRef: "allPeople" | "allEmails" | "allCommitments" | "allMoney" | "allDocuments" | "projects" | "agenda";
+    groupBy?: string;     // e.g. "status" | "direction"
+    callout?: string;     // an insight line to surface at the top of the drawer
+    lensLink?: { label: string; target: "communications" | "reasoning" | "navigator"; intent?: string };
+  };
+};
+
+export const visionSurface = {
+  badge: "V3 · Vision",
+  hinge: "You've seen the two lenses that ship first. Here's the whole picture they're part of.",
+  subline: "Where PSL/i is heading — today's product is the two lenses inside it.",
+
+  greeting: "Good morning, Maya.",
+  navigatorPrompt: "What do you want to do?",
+  // Navigator bar reuses scene2.suggestedPrompts; routes into the Navigator lens.
+
+  statusLine: "All systems connected · Personal Semantic Layer is up to date · Your data. Your context. Your decisions.",
+
+  tiles: [
+    { key: "people",       title: "People & Relationships", accent: "violet", primary: "16 people",   secondary: "5 waiting on you",
+      drawer: { title: "People & Relationships", sourceRef: "allPeople",
+        callout: "5 people are waiting on a reply — David, Glenn, Sofia, Alex, Nina." } },
+
+    { key: "comms",        title: "Communications",         accent: "blue",   primary: "26 emails",   secondary: "5 owed a reply",
+      drawer: { title: "Communications", sourceRef: "allEmails",
+        callout: "Resolved overnight — every message mapped to a person, commitment, or payment.",
+        lensLink: { label: "Open the Communications lens", target: "communications" } } },
+
+    { key: "commitments",  title: "Commitments & Decisions", accent: "amber", primary: "12 open",     secondary: "2 overdue",
+      drawer: { title: "Commitments & Decisions", sourceRef: "allCommitments", groupBy: "status",
+        callout: "The MSA decision (due today) is the one that unblocks Monday's partner meeting.",
+        lensLink: { label: "Ask: show me at-risk commitments", target: "reasoning", intent: "Show me at-risk commitments" } } },
+
+    { key: "financial",    title: "Financial Activity",     accent: "green",  primary: "$94k out",    secondary: "$41k in this week",
+      drawer: { title: "Financial Activity", sourceRef: "allMoney", groupBy: "direction",
+        callout: "The AWS spike (+38%) isn't a leak — it's the West Region load test. Payroll Fri is covered by Thursday's Stripe payout.",
+        lensLink: { label: "Ask: what do I owe Jane?", target: "reasoning", intent: "What do I owe Jane?" } } },
+
+    { key: "work",         title: "Work & Projects",        accent: "teal",   primary: "3 active",    secondary: "1 at risk",
+      drawer: { title: "Work & Projects", sourceRef: "projects", groupBy: "status",
+        callout: "West Region is at risk until the MSA clears — everything else is moving." } },
+
+    { key: "knowledge",    title: "Knowledge & Documents",  accent: "rose",   primary: "7 documents", secondary: "2 need action",
+      drawer: { title: "Knowledge & Documents", sourceRef: "allDocuments",
+        callout: "Your SOC 2 report can pre-fill ~80% of Cascade's security questionnaire." } },
+
+    { key: "time",         title: "Time",                   accent: "blue",   primary: "5 today",     secondary: "1 conflict",
+      drawer: { title: "Time", sourceRef: "agenda",
+        callout: "Friday's model deadline collides with your 6:10 PM flight — PSL/i kept Friday clear.",
+        lensLink: { label: "Ask: what's on my plate before the wedding?", target: "reasoning", intent: "What's on my plate before I leave for the wedding?" } } },
+  ],
+
+  // The "feel in control" centerpiece — mirrors the mockup's Priority Overview.
+  priorityOverview: {
+    title: "Priority Overview",
+    items: [
+      { tone: "critical", label: "The through-line", text: "One chain, not five problems — the MSA decision today unblocks Glenn's model for Monday.", connectionId: "x1" },
+      { tone: "warn",     label: "Overdue",          text: "Intro Priya to Alex at the Fresno depot (promised Wed).", commitmentId: "c3" },
+      { tone: "info",     label: "Financial",        text: "AWS up 38% — traced to the West Region load test, not a leak.", connectionId: "x2" },
+      { tone: "warn",     label: "Decision needed",  text: "Sofia's offer — her competing deadline is Friday.", commitmentId: "c8" },
+    ],
+  },
+
+  // The Navigator Assistant panel — "a few things I've prepared for you".
+  assistant: {
+    title: "Navigator Assistant",
+    greeting: "Good morning, Maya. Here are a few things I've prepared for you.",
+    items: [
+      { label: "Cascade renewal summary",        target: "reasoning", intent: "Summarize the West Region deal — people, docs, commitments, next step" },
+      { label: "What's blocking Monday",         target: "reasoning", intent: "What's blocking the partner meeting?" },
+      { label: "Draft the 5 replies you owe",    target: "navigator", intent: "Reply to Glenn confirming Thursday and remind me to send the model" },
+    ],
+  },
+};

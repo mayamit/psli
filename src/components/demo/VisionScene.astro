@@ -1,0 +1,536 @@
+---
+// Scene 4 — "Full picture": the V3 vision work surface, shown AFTER the three
+// V1 lenses and BEFORE the CTA. This is the finale reveal. The WHOLE surface is
+// badged "V3 · Vision" (baked in, screenshot-safe) — it is the vision, not the
+// shipping product — but everything inside is fully interactive: seven tiles
+// each open a detail drawer, and the Navigator bar / Priority Overview /
+// Assistant route into the real Navigator + Reasoning lenses with intent loaded.
+// V1-honest: the two shipping lenses live INSIDE this picture.
+import {
+  visionSurface, projects, agenda,
+  allPeople, allEmails, allCommitments, allMoney, allDocuments,
+  scene2, scene2ExtraResponses, scene3, scene3ExtraResponses,
+} from '../../data/demo';
+import { personById, statusMeta, moneyMeta } from '../../lib/demo';
+import { accent as accentMap, type Accent } from '../../lib/accents';
+
+// --- Response maps (mirror the two lens scenes) so routing resolves to a key --
+const featuredReasonKey = 'blocking-partner-meeting';
+const reasoningMap: Record<string, any> = {
+  [featuredReasonKey]: (scene3ExtraResponses as any)[featuredReasonKey],
+  ...scene3.responses,
+  ...scene3ExtraResponses,
+};
+const navigatorMap: Record<string, any> = { ...scene2.responses, ...scene2ExtraResponses };
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+
+// Fuzzy-match an intent string to its lens response key (same scoring the
+// lenses use at runtime), so a click can pre-load the exact answer/proposal.
+function fuzzyKey(map: Record<string, any>, query: string): string | null {
+  const q = norm(query);
+  let best: { key: string; score: number } | null = null;
+  for (const [key, r] of Object.entries(map)) {
+    let score = 0;
+    for (const t of (r.matches ?? [])) if (t && q.includes(norm(t))) score += t.length;
+    if (score > 0 && (!best || score > best.score)) best = { key, score };
+  }
+  return best?.key ?? null;
+}
+
+// Resolve a connection/commitment id to the most specific Reasoning answer that
+// cites it (smallest citation set wins — the answer that's most about this id).
+function reasoningKeyForId(opts: { connectionId?: string; commitmentId?: string }): string | null {
+  let best: { key: string; size: number } | null = null;
+  for (const [key, r] of Object.entries(reasoningMap)) {
+    for (const c of (r.citations ?? []) as any[]) {
+      let match = false, size = 99;
+      if (opts.connectionId) {
+        if (c.connectionId === opts.connectionId) { match = true; size = 1; }
+        else if ((c.connectionIds ?? []).includes(opts.connectionId)) { match = true; size = c.connectionIds.length; }
+      }
+      if (opts.commitmentId) {
+        if (c.commitmentId === opts.commitmentId) { match = true; size = 1; }
+        else if ((c.commitmentIds ?? []).includes(opts.commitmentId)) { match = true; size = c.commitmentIds.length; }
+      }
+      if (match && (!best || size < best.size)) best = { key, size };
+    }
+  }
+  return best?.key ?? null;
+}
+
+// --- Tile source resolution + grouping --------------------------------------
+const sourceMap: Record<string, any[]> = {
+  allPeople, allEmails, allCommitments, allMoney, allDocuments, projects, agenda,
+};
+
+// Group-header label + accent per (sourceRef, groupBy).
+const projectStatusMeta: Record<string, { label: string; accent: Accent }> = {
+  'at-risk': { label: 'At risk', accent: 'amber' },
+  active: { label: 'Active', accent: 'blue' },
+  'on-track': { label: 'On track', accent: 'green' },
+};
+function groupMetaFor(sourceRef: string): Record<string, { label: string; accent: Accent }> | null {
+  if (sourceRef === 'allCommitments') return statusMeta as any;
+  if (sourceRef === 'allMoney') return moneyMeta as any;
+  if (sourceRef === 'projects') return projectStatusMeta;
+  return null;
+}
+// Sort groups: most-urgent first, calmly (overdue/at-risk → done, owe → incoming).
+const groupRank: Record<string, number> = {
+  overdue: 0, 'at-risk': 1, active: 2, 'on-track': 3, done: 4,
+  owe: 0, incoming: 1, 'spend-alert': 2,
+};
+
+const tiles = visionSurface.tiles.map((tile) => {
+  const items = sourceMap[tile.drawer.sourceRef] ?? [];
+  const gb = tile.drawer.groupBy;
+  let groups: [string, any[]][];
+  if (gb) {
+    const byKey: Record<string, any[]> = {};
+    for (const it of items) { const k = (it as any)[gb]; (byKey[k] ??= []).push(it); }
+    groups = Object.entries(byKey).sort((a, b) => (groupRank[a[0]] ?? 99) - (groupRank[b[0]] ?? 99));
+  } else {
+    groups = [['', items]];
+  }
+  const link = tile.drawer.lensLink;
+  const lensKey = link?.intent
+    ? fuzzyKey(link.target === 'navigator' ? navigatorMap : reasoningMap, link.intent)
+    : null;
+  return { ...tile, items, groups, groupMeta: groupMetaFor(tile.drawer.sourceRef), lensKey };
+});
+
+// --- Priority Overview + Assistant routing ----------------------------------
+const toneMeta: Record<string, { accent: Accent; label: string }> = {
+  critical: { accent: 'rose', label: 'Critical path' },
+  warn: { accent: 'amber', label: 'Attention' },
+  info: { accent: 'blue', label: 'Note' },
+};
+const priorityItems = visionSurface.priorityOverview.items.map((it: any) => ({
+  ...it,
+  routeKey: reasoningKeyForId({ connectionId: it.connectionId, commitmentId: it.commitmentId }),
+}));
+const assistantItems = visionSurface.assistant.items.map((it: any) => ({
+  ...it,
+  routeKey: fuzzyKey(it.target === 'navigator' ? navigatorMap : reasoningMap, it.intent),
+}));
+
+// Navigator command-bar chips = the Navigator lens's suggested prompts.
+const navChips = scene2.suggestedPrompts
+  .map((label) => ({ label, key: fuzzyKey(navigatorMap, label) }))
+  .filter((c): c is { label: string; key: string } => Boolean(c.key));
+
+// Small helper for the router: which lens (custom event) a target uses.
+function routeAttrs(target: string, key: string | null) {
+  return { 'data-route-target': target, 'data-route-key': key ?? '' };
+}
+---
+
+<section aria-labelledby="scene4-title" data-vision-scene>
+  <!-- Hinge: full-width transition line from "the two lenses" to "the whole picture" -->
+  <div class="-mx-5 mb-8 border-y border-border bg-bg px-5 py-6 sm:-mx-8 sm:px-8" style="background:linear-gradient(135deg,rgba(106,92,246,.06),rgba(139,124,248,.04))">
+    <p id="scene4-title" class="mx-auto max-w-3xl text-center text-lg font-medium leading-relaxed text-ink sm:text-[22px] sm:leading-snug">
+      {visionSurface.hinge}
+    </p>
+  </div>
+
+  <!-- The work surface. Badged as VISION at the top, interactive throughout. -->
+  <div class="overflow-hidden rounded-[var(--radius-card)] border border-border bg-surface shadow-[var(--shadow-lift)]">
+    <!-- Baked-in "V3 · Vision" band — screenshot-safe, unmistakable -->
+    <div class="sticky top-0 z-20 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-primary/20 px-4 py-3 sm:px-5" style="background:linear-gradient(135deg,rgba(106,92,246,.12),rgba(139,124,248,.06))">
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-700">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" /></svg>
+        {visionSurface.badge}
+      </span>
+      <p class="text-[13px] font-medium text-ink-2">{visionSurface.subline}</p>
+    </div>
+
+    <div class="p-4 sm:p-6">
+      <!-- Navigator command bar -->
+      <div class="rounded-[var(--radius-card)] border border-border bg-bg/60 p-4 sm:p-5">
+        <p class="text-[15px] font-semibold text-ink">{visionSurface.greeting}</p>
+        <form data-vision-nav-form novalidate class="mt-3 flex items-center gap-2 rounded-[var(--radius-btn)] border border-border bg-surface px-2 py-1.5 shadow-[var(--shadow-card)] transition-colors focus-within:border-primary/50">
+          <span class="ml-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white" style="background:var(--grad)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" /></svg>
+          </span>
+          <input
+            type="text"
+            data-vision-nav-input
+            autocomplete="off"
+            placeholder={visionSurface.navigatorPrompt}
+            aria-label="Tell Navigator what you want"
+            class="min-w-0 flex-1 bg-transparent px-1 py-1 text-[14px] text-ink placeholder:text-muted focus:outline-none"
+          />
+          <button type="submit" class="shrink-0 rounded-[8px] bg-primary px-3.5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-primary-700">
+            Ask Navigator
+          </button>
+        </form>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {navChips.map((chip) => (
+            <button
+              type="button"
+              {...routeAttrs('navigator', chip.key)}
+              class="rounded-full border border-border bg-surface px-3.5 py-1.5 text-[13px] font-medium text-ink-2 transition-colors hover:border-primary hover:text-primary focus-visible:outline-2"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Seven tiles -->
+      <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {tiles.map((tile) => {
+          const a = accentMap[tile.accent as Accent];
+          return (
+            <button
+              type="button"
+              data-tile-open={tile.key}
+              data-tile-title={tile.drawer.title}
+              class="group flex flex-col rounded-[var(--radius-card)] border border-border bg-surface p-4 text-left shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:border-primary/40 focus-visible:outline-2"
+            >
+              <span class="flex items-center justify-between">
+                <span class={`h-2.5 w-2.5 rounded-full ${a.bg}`} aria-hidden="true"></span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="text-muted transition-colors group-hover:text-primary" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </span>
+              <span class="mt-3 text-[13.5px] font-semibold leading-snug text-ink">{tile.title}</span>
+              <span class="mt-2 text-[15px] font-semibold text-ink">{tile.primary}</span>
+              <span class={`mt-0.5 text-[12px] font-medium ${a.text}`}>{tile.secondary}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <!-- Centerpiece: Priority Overview + Navigator Assistant rail -->
+      <div class="mt-5 grid gap-3 lg:grid-cols-3">
+        <!-- Priority Overview (the "feel in control" centerpiece) -->
+        <div class="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-5 lg:col-span-2">
+          <div class="mb-3 flex items-center gap-2">
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg text-white" style="background:var(--grad)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" /></svg>
+            </span>
+            <h3 class="text-[15px] font-semibold text-ink">{visionSurface.priorityOverview.title}</h3>
+          </div>
+          <ul class="flex flex-col gap-2">
+            {priorityItems.map((it) => {
+              const tm = toneMeta[it.tone] ?? toneMeta.info;
+              const a = accentMap[tm.accent];
+              const clickable = Boolean(it.routeKey);
+              const El = clickable ? 'button' : 'div';
+              return (
+                <li>
+                  <El
+                    {...(clickable ? { type: 'button', ...routeAttrs('reasoning', it.routeKey) } : {})}
+                    class:list={[
+                      'flex w-full items-start gap-3 rounded-[var(--radius-card)] border border-border bg-bg/50 px-3.5 py-3 text-left',
+                      clickable && 'transition-all hover:border-primary/40 hover:bg-surface focus-visible:outline-2',
+                    ]}
+                  >
+                    <span class={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${a.text} ${a.softBg}`}>{it.label}</span>
+                    <span class="min-w-0 flex-1 text-[13.5px] leading-relaxed text-ink-2">{it.text}</span>
+                    {clickable && (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" class="mt-0.5 shrink-0 text-muted" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    )}
+                  </El>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <!-- Navigator Assistant -->
+        <div class="rounded-[var(--radius-card)] border border-border bg-surface p-4 shadow-[var(--shadow-card)] sm:p-5">
+          <h3 class="text-[15px] font-semibold text-ink">{visionSurface.assistant.title}</h3>
+          <p class="mt-1.5 text-[13px] leading-relaxed text-ink-2">{visionSurface.assistant.greeting}</p>
+          <div class="mt-3 flex flex-col gap-2">
+            {assistantItems.map((it) => (
+              <button
+                type="button"
+                {...routeAttrs(it.target, it.routeKey)}
+                class="flex items-center gap-2 rounded-[var(--radius-btn)] border border-border bg-bg/60 px-3 py-2.5 text-left text-[13px] font-medium text-ink transition-colors hover:border-primary hover:text-primary focus-visible:outline-2"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="shrink-0 text-primary" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <span class="min-w-0 flex-1">{it.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer status line (carries the trust tagline + a repeat of the badge) -->
+      <div class="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-[var(--radius-card)] border border-border bg-bg/50 px-4 py-3">
+        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-c-green" aria-hidden="true"></span>
+        <p class="min-w-0 flex-1 text-[12.5px] text-muted">{visionSurface.statusLine}</p>
+        <span class="shrink-0 rounded-full border border-primary/25 bg-primary-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-700">{visionSurface.badge}</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs text-muted">
+    Everything here is interactive — open any tile, or tap a priority to jump into the lens that answers it. The surface is the vision; the lenses inside it ship first.
+  </p>
+
+  <!-- ====================== DETAIL DRAWER (slide-in) ====================== -->
+  <div data-drawer-overlay hidden class="fixed inset-0 z-50 flex justify-end">
+    <div data-drawer-backdrop class="absolute inset-0 bg-ink/30 opacity-0 transition-opacity duration-300 motion-reduce:transition-none"></div>
+    <div
+      data-drawer-panel
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="drawer-title"
+      class="relative flex h-full w-full max-w-md translate-x-full flex-col bg-surface shadow-[var(--shadow-lift)] transition-transform duration-300 ease-out motion-reduce:transition-none sm:max-w-lg"
+    >
+      <!-- drawer header -->
+      <div class="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="shrink-0 rounded-full border border-primary/25 bg-primary-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-700">{visionSurface.badge}</span>
+          <h2 id="drawer-title" data-drawer-title class="truncate text-[16px] font-semibold text-ink"></h2>
+        </div>
+        <button type="button" data-drawer-close aria-label="Close" class="shrink-0 rounded-lg p-1.5 text-muted transition-colors hover:bg-bg hover:text-ink focus-visible:outline-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+
+      <!-- drawer bodies (one per tile, revealed on open) -->
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        {tiles.map((tile) => {
+          const sr = tile.drawer.sourceRef;
+          return (
+            <div data-drawer-body={tile.key} hidden>
+              {tile.drawer.callout && (
+                <div class="mb-4 flex items-start gap-2.5 rounded-[var(--radius-card)] border border-primary/20 px-3.5 py-3" style="background:linear-gradient(135deg,rgba(106,92,246,.08),rgba(139,124,248,.04))">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="mt-0.5 shrink-0 text-primary" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" /></svg>
+                  <p class="text-[13.5px] font-medium leading-relaxed text-ink">{tile.drawer.callout}</p>
+                </div>
+              )}
+
+              <div class="flex flex-col gap-4">
+                {tile.groups.map(([gkey, gitems]) => {
+                  const gm = tile.groupMeta && gkey ? tile.groupMeta[gkey] : null;
+                  return (
+                    <div>
+                      {gm && (
+                        <p class="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted">
+                          <span class={`h-2 w-2 rounded-full ${accentMap[gm.accent].bg}`}></span>
+                          {gm.label}
+                          <span class="font-medium normal-case text-muted/70">· {gitems.length}</span>
+                        </p>
+                      )}
+                      <ul class="flex flex-col gap-2">
+                        {gitems.map((item: any) => {
+                          const person = personById[item.personId] ?? personById[item.from];
+                          const pa = person ? accentMap[person.accent as Accent] : accentMap.violet;
+                          return (
+                            <li class="rounded-[var(--radius-card)] border border-border bg-surface px-3.5 py-3">
+                              {/* People */}
+                              {sr === 'allPeople' && (
+                                <div class="flex items-center gap-3">
+                                  <span class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-xs font-semibold ${accentMap[item.accent as Accent].softBg} ${accentMap[item.accent as Accent].text}`}>{item.initials}</span>
+                                  <div class="min-w-0">
+                                    <p class="truncate text-[14px] font-semibold text-ink">{item.name}</p>
+                                    <p class="truncate text-[12px] text-muted">{item.role} · {item.relationship}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Emails */}
+                              {sr === 'allEmails' && (
+                                <div class="flex items-start gap-3">
+                                  <span class={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-xs font-semibold ${pa.softBg} ${pa.text}`}>{person?.initials ?? '—'}</span>
+                                  <div class="min-w-0 flex-1">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                      <p class="truncate text-[13.5px] font-semibold text-ink">{item.subject}</p>
+                                      <span class="shrink-0 text-[11px] text-muted">{item.date}</span>
+                                    </div>
+                                    <p class="text-[12px] text-muted">{person?.name ?? item.from}</p>
+                                    <p class="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-ink-2">{item.snippet}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Commitments */}
+                              {sr === 'allCommitments' && (
+                                <div class="flex items-start gap-2.5">
+                                  <span class={`mt-1 h-2 w-2 shrink-0 rounded-full ${accentMap[statusMeta[item.status].accent].bg}`}></span>
+                                  <div class="min-w-0 flex-1">
+                                    <p class="text-[13.5px] font-medium text-ink">{item.text}</p>
+                                    <p class="mt-0.5 text-[12px] text-muted">{person?.name ? `to ${person.name} · ` : ''}due {item.due}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Money */}
+                              {sr === 'allMoney' && (
+                                <div class="flex items-start gap-3">
+                                  <span class={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-xs font-semibold ${pa.softBg} ${pa.text}`}>{person?.initials ?? '$'}</span>
+                                  <div class="min-w-0 flex-1">
+                                    <div class="flex items-baseline justify-between gap-2">
+                                      <p class="min-w-0 flex-1 truncate text-[13.5px] font-medium text-ink">{item.label}</p>
+                                      <span class="shrink-0 text-[13.5px] font-semibold text-ink">{item.amount}</span>
+                                    </div>
+                                    <p class="text-[12px] text-muted">{person?.name ?? ''}{item.note ? ` · ${item.note}` : ''}{item.due ? ` · due ${item.due}` : ''}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Documents */}
+                              {sr === 'allDocuments' && (
+                                <div class="flex items-start gap-3">
+                                  <span class="mt-0.5 shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-[10.5px] font-semibold text-primary-700">{item.kind}</span>
+                                  <div class="min-w-0 flex-1">
+                                    <p class="text-[13.5px] font-semibold text-ink">{item.title}</p>
+                                    <p class="mt-0.5 text-[12px] text-muted">→ {item.resolvedInto}</p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Projects */}
+                              {sr === 'projects' && (
+                                <div>
+                                  <p class="text-[13.5px] font-semibold text-ink">{item.name}</p>
+                                  <p class="mt-1 text-[12.5px] leading-relaxed text-ink-2">{item.detail}</p>
+                                  <div class="mt-2 flex -space-x-1.5">
+                                    {item.personIds.map((pid: string) => {
+                                      const pp = personById[pid];
+                                      const ppa = pp ? accentMap[pp.accent as Accent] : accentMap.violet;
+                                      return pp ? (
+                                        <span class={`flex h-6 w-6 items-center justify-center rounded-full border border-surface text-[9.5px] font-semibold ${ppa.softBg} ${ppa.text}`} title={pp.name}>{pp.initials}</span>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Agenda */}
+                              {sr === 'agenda' && (
+                                <div class="flex items-start gap-3">
+                                  <span class="shrink-0 rounded-md bg-bg px-2 py-1 text-[11px] font-semibold text-ink-2">{item.time}</span>
+                                  <div class="min-w-0 flex-1">
+                                    <p class="text-[13.5px] font-medium text-ink">{item.label}</p>
+                                    {item.note && <p class="mt-0.5 text-[12px] text-muted">{item.note}</p>}
+                                  </div>
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {tile.drawer.lensLink && (
+                <button
+                  type="button"
+                  {...routeAttrs(tile.drawer.lensLink.target, tile.lensKey)}
+                  class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-[var(--radius-btn)] bg-primary px-4 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-primary-700"
+                >
+                  {tile.drawer.lensLink.label}
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const scene = document.querySelector('[data-vision-scene]');
+  if (scene) {
+    // ---- Cross-lens routing: click a tile-link / priority / assistant item ----
+    function route(target: string, key: string) {
+      const sceneNum = target === 'navigator' ? 2 : target === 'reasoning' ? 3 : 1;
+      const tab = document.querySelector<HTMLButtonElement>(`[data-scene="${sceneNum}"]`);
+      tab?.click(); // hands off to DemoShell (switches panel + scrolls to top)
+      if (!key) return;
+      const evt = target === 'navigator' ? 'demo:goto-nav' : 'demo:goto-reason';
+      // Let the panel become visible first, then reveal the specific response.
+      // setTimeout (not rAF) so the hand-off fires reliably regardless of tab focus.
+      setTimeout(() => document.dispatchEvent(new CustomEvent(evt, { detail: { key } })), 40);
+    }
+
+    // Free-text Navigator bar: switch to the Navigator lens, load the query into
+    // its own input, and submit — reusing the lens's fuzzy match + fallback so
+    // an unrecognised ask behaves exactly as it does natively in that lens.
+    const navForm = scene.querySelector<HTMLFormElement>('[data-vision-nav-form]');
+    const navInput = scene.querySelector<HTMLInputElement>('[data-vision-nav-input]');
+    navForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = navInput?.value.trim();
+      if (!q) return;
+      const tab = document.querySelector<HTMLButtonElement>('[data-scene="2"]');
+      tab?.click(); // hands off to DemoShell (switches panel + scrolls to top)
+      setTimeout(() => {
+        const lensInput = document.querySelector<HTMLInputElement>('[data-nav-input]');
+        const lensForm = document.querySelector<HTMLFormElement>('[data-nav-form]');
+        if (!lensInput || !lensForm) return;
+        lensInput.value = q;
+        if (typeof lensForm.requestSubmit === 'function') lensForm.requestSubmit();
+        else lensForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }, 50);
+    });
+
+    // ---- Detail drawer (slide-in) --------------------------------------------
+    const overlay = scene.querySelector<HTMLElement>('[data-drawer-overlay]');
+    const backdrop = scene.querySelector<HTMLElement>('[data-drawer-backdrop]');
+    const panel = scene.querySelector<HTMLElement>('[data-drawer-panel]');
+    const titleEl = scene.querySelector<HTMLElement>('[data-drawer-title]');
+    const closeBtn = scene.querySelector<HTMLButtonElement>('[data-drawer-close]');
+    const bodies = Array.from(scene.querySelectorAll<HTMLElement>('[data-drawer-body]'));
+    let lastFocus: HTMLElement | null = null;
+
+    function openDrawer(key: string, title: string) {
+      if (!overlay || !panel || !backdrop) return;
+      lastFocus = document.activeElement as HTMLElement;
+      bodies.forEach((b) => (b.hidden = b.getAttribute('data-drawer-body') !== key));
+      if (titleEl) titleEl.textContent = title;
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      // next frame → animate in
+      requestAnimationFrame(() => {
+        panel.classList.remove('translate-x-full');
+        backdrop.classList.remove('opacity-0');
+      });
+      closeBtn?.focus();
+    }
+
+    function closeDrawer() {
+      if (!overlay || !panel || !backdrop) return;
+      panel.classList.add('translate-x-full');
+      backdrop.classList.add('opacity-0');
+      document.body.style.overflow = '';
+      const done = () => { overlay.hidden = true; panel.removeEventListener('transitionend', done); };
+      panel.addEventListener('transitionend', done);
+      // fallback for reduced-motion (no transitionend fires)
+      setTimeout(() => { if (!overlay.hidden) overlay.hidden = true; }, 350);
+      lastFocus?.focus();
+    }
+
+    scene.querySelectorAll<HTMLButtonElement>('[data-tile-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-tile-open')!;
+        openDrawer(key, btn.getAttribute('data-tile-title') ?? '');
+      });
+    });
+
+    backdrop?.addEventListener('click', closeDrawer);
+    closeBtn?.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay && !overlay.hidden) closeDrawer();
+    });
+
+    // Any element carrying a route target routes into a lens (and closes the drawer).
+    scene.querySelectorAll<HTMLElement>('[data-route-target]').forEach((el) => {
+      el.addEventListener('click', () => {
+        const target = el.getAttribute('data-route-target')!;
+        const key = el.getAttribute('data-route-key') ?? '';
+        if (overlay && !overlay.hidden) closeDrawer();
+        route(target, key);
+      });
+    });
+  }
+</script>

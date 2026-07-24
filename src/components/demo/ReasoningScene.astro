@@ -238,6 +238,17 @@ function citationAccent(c: any): Accent {
       chip.addEventListener('click', () => show(chip.getAttribute('data-reason-chip')!));
     });
 
+    // Cross-lens routing: the Full-picture surface asks us to reveal a specific
+    // answer by key (dispatched after DemoShell switches to this panel).
+    document.addEventListener('demo:goto-reason', (e) => {
+      const key = (e as CustomEvent).detail?.key;
+      const target = key && responses.find((p) => p.getAttribute('data-reason-response') === key);
+      if (target) {
+        show(key);
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const q = normalize(input?.value ?? '');
